@@ -6,9 +6,9 @@ Three modes depending on what you need:
 
 | Mode | You have… | You get… |
 |---|---|---|
-| **Visualize** | A question about your data | A dashboard |
-| **Explore** | An existing KQL query | Follow-up analyses + deeper insights |
-| **Investigate** | A hypothesis to prove or disprove | Evidence dashboards + a verdict |
+| [**Visualize**](#1-visualize--ask-a-question-get-a-dashboard) | A question about your data | A dashboard |
+| [**Explore**](#2-explore--start-from-a-kql-query-go-deeper) | An existing KQL query | Follow-up analyses + deeper insights |
+| [**Investigate**](#3-investigate--prove-or-disprove-a-hypothesis) | A hypothesis to prove or disprove | Evidence dashboards + a verdict |
 
 ---
 

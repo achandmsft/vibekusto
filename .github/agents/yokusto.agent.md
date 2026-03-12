@@ -287,18 +287,49 @@ h1 {
 After generating the HTML, open it automatically so the user sees the result immediately.
 
 ### 8. Preserve artifacts
-After a successful run, save:
+After a successful run, save these **required** artifacts:
 - The HTML visualization (primary output)
 - The Python script that produced it (so the user can re-run or modify)
-- A `.kql` file with the final working queries (reusable artifact for Kusto Explorer)
+- **A `.kql` file with every KQL query used in the project** (reusable artifact for Kusto Explorer — see KQL file rules below)
+- A `README.md` (see README rules below)
 
+#### KQL file rules
+The `.kql` file is a **mandatory** deliverable — never skip it. It captures every query the project uses so they can be copy-pasted directly into Kusto Explorer or Azure Data Explorer web UI.
+
+Format:
+- One file per project: `queries.kql` (or `<topic>.kql` if there is only one dashboard).
+- Group queries by dashboard or stage with comment headers: `// === Dashboard: Storm Overview ===`.
+- Add a brief comment above each query describing what it returns.
+- Include the database name in a comment at the top of each group: `// Database: Samples`.
+- Queries must be runnable as-is — no Python string interpolation or f-string placeholders.
+- If the Python script dynamically builds a query (e.g., batching IDs), include a representative example with a comment noting the dynamic part.
+
+Generate the `.kql` file at the same time as the HTML — do not defer it to a later step.
+
+#### Project folder rules
 All artifacts go into a project subfolder under `projects/`:
 - At the start of a new analytics task, infer a short kebab-case project name from the topic (e.g., `storm-damage`, `q4-revenue`, `daily-active-users`).
 - Create `projects/<project-name>/` if it doesn't exist.
-- Write all files there: `projects/<project-name>/<topic>_dashboard.html`, `projects/<project-name>/run_<topic>.py`, `projects/<project-name>/<topic>.kql`
+- Write all files there: `projects/<project-name>/<topic>_dashboard.html`, `projects/<project-name>/run_<topic>.py`, `projects/<project-name>/queries.kql`
 - Do not ask the user for the project name — infer it. Only ask if the topic is truly ambiguous.
 - For follow-up queries in the same session, reuse the same project folder.
-- **Always create a `README.md`** in the project folder. It should be brief (under 40 lines) and include:
+
+#### Clean folder structure
+A finished project folder should contain **only** these files at the root level:
+| File | Required | Purpose |
+|---|---|---|
+| `README.md` | Yes | Project summary, findings, re-run instructions |
+| `queries.kql` | Yes | All KQL queries, grouped and annotated |
+| `run_<topic>.py` | Yes | Main pipeline script (query + render) |
+| `*_dashboard.html` / `hypothesis_*.html` | Yes | Dashboard output(s) |
+| `render_*_from_cache.py` | If cache pattern used | Offline re-renderer |
+| `_<topic>_data.json` | If cache pattern used | Data cache for offline rendering |
+| `images/` | If screenshots needed | Preview images for README |
+
+**Do not leave** intermediate helper scripts, duplicate query files, scratch notebooks, or debug artifacts in the project root. If temporary files are needed during development, either delete them when done or move them to a `scratch/` subfolder. The goal is a project folder a new user can open and immediately understand.
+
+#### README rules
+**Always create a `README.md`** in the project folder. It should be brief (under 40 lines) and include:
   - A one-line title and summary of what the project analyzes.
   - The hypothesis or question being answered (if applicable).
   - A table listing each dashboard file with a short description.

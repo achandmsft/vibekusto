@@ -1,0 +1,106 @@
+// ============================================================
+// yokusto Demo — Investigate Mode Queries
+// Cluster: https://help.kusto.windows.net
+// Database: Samples | Table: StormEvents
+//
+// Hypothesis: "Flood events cause disproportionately more
+// property damage per event than any other storm type, and
+// this pattern is driven by geographic hotspots."
+// ============================================================
+
+// ── Dashboard 1: Total Damage Ranking ──
+
+// 1a. Top 10 event types by total damage
+StormEvents
+| summarize
+    Events = count(),
+    TotalDamage = sum(DamageProperty + DamageCrops),
+    PropertyDamage = sum(DamageProperty),
+    CropDamage = sum(DamageCrops),
+    Deaths = sum(DeathsDirect + DeathsIndirect),
+    Injuries = sum(InjuriesDirect + InjuriesIndirect)
+  by EventType
+| top 10 by TotalDamage desc
+
+
+// ── Dashboard 2: Per-Event Damage Comparison ──
+
+// 2a. Per-event damage normalized (min 20 events)
+StormEvents
+| summarize
+    Events = count(),
+    TotalDamage = sum(DamageProperty + DamageCrops)
+  by EventType
+| where Events >= 20
+| extend PerEventDamage = TotalDamage / Events
+| top 10 by PerEventDamage desc
+
+// 2b. Flood vs non-flood per-event comparison
+StormEvents
+| extend IsFlood = EventType in ('Flood', 'Flash Flood')
+| summarize
+    Events = count(),
+    TotalDamage = sum(DamageProperty + DamageCrops),
+    Deaths = sum(DeathsDirect + DeathsIndirect)
+  by IsFlood
+| extend PerEvent = TotalDamage / Events
+
+
+// ── Dashboard 3: Geographic Hotspots ──
+
+// 3a. Flood damage by state — top 15
+StormEvents
+| where EventType in ('Flood', 'Flash Flood')
+| summarize
+    FloodDamage = sum(DamageProperty + DamageCrops),
+    Events = count(),
+    Deaths = sum(DeathsDirect + DeathsIndirect)
+  by State
+| top 15 by FloodDamage desc
+
+// 3b. Monthly flood damage trend
+StormEvents
+| where EventType in ('Flood', 'Flash Flood')
+| summarize
+    Damage = sum(DamageProperty + DamageCrops),
+    Events = count(),
+    Deaths = sum(DeathsDirect + DeathsIndirect)
+  by Month = startofmonth(StartTime)
+| order by Month asc
+
+
+// ── Additional Analysis Queries ──
+
+// 4. Monthly trend for top 4 damage types
+let topTypes = StormEvents
+    | summarize D = sum(DamageProperty + DamageCrops) by EventType
+    | top 4 by D
+    | project EventType;
+StormEvents
+| where EventType in (topTypes)
+| summarize
+    Damage = sum(DamageProperty + DamageCrops),
+    Events = count()
+  by Month = startofmonth(StartTime), EventType
+| order by Month asc, EventType asc
+
+// 5. Quarterly flood trend
+StormEvents
+| where EventType in ('Flood', 'Flash Flood')
+| summarize
+    Damage = sum(DamageProperty + DamageCrops),
+    Events = count(),
+    Deaths = sum(DeathsDirect + DeathsIndirect)
+  by Quarter = startofmonth(StartTime)
+| order by Quarter asc
+
+// 6. Death rate per 1000 events by type
+StormEvents
+| summarize
+    Events = count(),
+    Deaths = sum(DeathsDirect + DeathsIndirect),
+    Damage = sum(DamageProperty + DamageCrops)
+  by EventType
+| where Deaths > 0
+| extend DeathRate = round(todouble(Deaths) / Events * 1000, 1)
+| top 10 by Deaths desc

@@ -1,0 +1,79 @@
+// ============================================================
+// yokusto Demo — Explore Mode Queries
+// Cluster: https://help.kusto.windows.net
+// Database: Samples | Table: StormEvents
+// ============================================================
+
+// ── Seed Query ──
+// "StormEvents | summarize count() by State | top 10 by count_"
+
+StormEvents
+| summarize EventCount = count() by State
+| top 10 by EventCount desc
+
+
+// ── Follow-up 1: Storm types in top 10 states ──
+
+let topStates = StormEvents
+    | summarize c = count() by State
+    | top 10 by c
+    | project State;
+StormEvents
+| where State in (topStates)
+| summarize
+    Events = count(),
+    Damage = sum(DamageProperty + DamageCrops)
+  by State, EventType
+| top 50 by Events desc
+
+
+// ── Follow-up 2: Monthly trend for top 10 states ──
+
+let topStates = StormEvents
+    | summarize c = count() by State
+    | top 10 by c
+    | project State;
+StormEvents
+| where State in (topStates)
+| summarize
+    Events = count(),
+    Damage = sum(DamageProperty + DamageCrops)
+  by Month = startofmonth(StartTime), State
+| order by Month asc, State asc
+
+
+// ── Follow-up 3: Damage per event by state (min 50 events) ──
+
+StormEvents
+| summarize
+    Events = count(),
+    TotalDamage = sum(DamageProperty + DamageCrops),
+    Deaths = sum(DeathsDirect + DeathsIndirect)
+  by State
+| where Events >= 50
+| extend DamagePerEvent = TotalDamage / Events
+| top 15 by DamagePerEvent desc
+
+
+// ── Follow-up 4: Hour-of-day storm pattern ──
+
+let topStates = StormEvents
+    | summarize c = count() by State
+    | top 10 by c
+    | project State;
+StormEvents
+| where State in (topStates)
+| extend Hour = datetime_part("hour", StartTime)
+| summarize Events = count() by Hour
+| order by Hour asc
+
+
+// ── Follow-up 5: Event type diversity by state ──
+
+StormEvents
+| summarize
+    EventTypes = dcount(EventType),
+    Events = count(),
+    Damage = sum(DamageProperty + DamageCrops)
+  by State
+| top 15 by Events desc

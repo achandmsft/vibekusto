@@ -1,0 +1,161 @@
+// ============================================================
+// yokusto Demo — Visualize Mode Queries
+// Cluster: https://help.kusto.windows.net
+// ============================================================
+
+// ── Storm Dashboard (Database: Samples, Table: StormEvents) ──
+
+// 1. Overview KPIs
+StormEvents
+| summarize
+    Events = count(),
+    PropertyDamage = sum(DamageProperty),
+    CropDamage = sum(DamageCrops),
+    Deaths = sum(DeathsDirect + DeathsIndirect),
+    Injuries = sum(InjuriesDirect + InjuriesIndirect),
+    States = dcount(State)
+
+// 2. Top 12 event types by total damage
+StormEvents
+| summarize
+    Events = count(),
+    TotalDamage = sum(DamageProperty + DamageCrops),
+    Deaths = sum(DeathsDirect + DeathsIndirect),
+    Injuries = sum(InjuriesDirect + InjuriesIndirect)
+  by EventType
+| top 12 by TotalDamage desc
+
+// 3. Monthly trend
+StormEvents
+| summarize
+    Events = count(),
+    Damage = sum(DamageProperty + DamageCrops),
+    Deaths = sum(DeathsDirect + DeathsIndirect)
+  by Month = startofmonth(StartTime)
+| order by Month asc
+
+// 4. Top 15 states by property + crop damage
+StormEvents
+| summarize
+    Events = count(),
+    PropertyDamage = sum(DamageProperty),
+    CropDamage = sum(DamageCrops),
+    Deaths = sum(DeathsDirect + DeathsIndirect)
+  by State
+| top 15 by PropertyDamage + CropDamage desc
+
+// 5. Deadliest event types (top 10)
+StormEvents
+| summarize
+    Deaths = sum(DeathsDirect + DeathsIndirect),
+    Events = count(),
+    Damage = sum(DamageProperty + DamageCrops)
+  by EventType
+| where Deaths > 0
+| top 10 by Deaths desc
+
+
+// ── Sales Dashboard (Database: ContosoSales, Table: SalesTable) ──
+
+// 6. Sales overview KPIs
+SalesTable
+| summarize
+    Revenue = sum(SalesAmount),
+    Cost = sum(TotalCost),
+    Txns = count(),
+    Customers = dcount(CustomerKey)
+
+// 7. Monthly revenue trend
+SalesTable
+| summarize
+    Revenue = sum(SalesAmount),
+    Cost = sum(TotalCost),
+    Txns = count()
+  by Month = startofmonth(DateKey)
+| order by Month asc
+
+// 8. Top 10 countries by revenue
+SalesTable
+| summarize
+    Revenue = sum(SalesAmount),
+    Cost = sum(TotalCost),
+    Txns = count()
+  by Country
+| top 10 by Revenue desc
+
+// 9. Revenue by product category (with lookup)
+SalesTable
+| lookup (Products | project ProductKey, ProductCategoryName) on ProductKey
+| summarize
+    Revenue = sum(SalesAmount),
+    Cost = sum(TotalCost),
+    Txns = count()
+  by ProductCategoryName
+| order by Revenue desc
+
+// 10. Top 15 cities by revenue
+SalesTable
+| summarize
+    Revenue = sum(SalesAmount),
+    Txns = count()
+  by City, Country
+| top 15 by Revenue desc
+
+// 11. Revenue by gender
+SalesTable
+| summarize Revenue = sum(SalesAmount) by Gender
+
+// 12. Revenue by education level
+SalesTable
+| summarize Revenue = sum(SalesAmount) by Education
+| order by Revenue desc
+
+
+// ── Seasons Dashboard (Database: Samples, Table: StormEvents) ──
+
+// 13. Heatmap — top 10 storm types by month
+StormEvents
+| summarize Events = count() by MonthNum = monthofyear(StartTime), EventType
+| join kind=inner (
+    StormEvents | summarize TotalEvents = count() by EventType | top 10 by TotalEvents desc
+  ) on EventType
+| project MonthNum, EventType, Events
+| order by EventType asc, MonthNum asc
+
+// 14. Hourly distribution of storms
+StormEvents
+| summarize Events = count() by Hour = hourofday(StartTime)
+| order by Hour asc
+
+// 15. Storm duration statistics by type
+StormEvents
+| extend DurationHrs = datetime_diff('hour', EndTime, StartTime)
+| where DurationHrs >= 0 and DurationHrs <= 720
+| summarize
+    AvgDurationHrs = round(avg(DurationHrs), 1),
+    MaxDurationHrs = max(DurationHrs),
+    Events = count()
+  by EventType
+| top 12 by AvgDurationHrs desc
+
+// 16. Seasonal summary (Spring / Summer / Fall / Winter)
+StormEvents
+| extend Season = case(
+    monthofyear(StartTime) in (3,4,5), "Spring",
+    monthofyear(StartTime) in (6,7,8), "Summer",
+    monthofyear(StartTime) in (9,10,11), "Fall",
+    "Winter")
+| summarize
+    Events = count(),
+    Damage = sum(DamageProperty + DamageCrops),
+    Deaths = sum(DeathsDirect + DeathsIndirect)
+  by Season
+| order by Events desc
+
+// 17. Top 20 state × month combinations
+StormEvents
+| summarize
+    Events = count(),
+    Damage = sum(DamageProperty + DamageCrops)
+  by State, MonthName = format_datetime(StartTime, "MMM")
+| top 20 by Events desc
