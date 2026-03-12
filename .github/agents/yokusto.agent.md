@@ -140,8 +140,11 @@ from azure.identity import AzureCliCredential
 from azure.kusto.data import KustoClient, KustoConnectionStringBuilder, ClientRequestProperties
 from datetime import timedelta
 from collections import defaultdict
+import time
 
 cred = AzureCliCredential()
+MAX_RETRIES = 3
+RETRY_BACKOFF = [10, 20, 30]
 
 def make_client(url):
     kcsb = KustoConnectionStringBuilder.with_azure_token_credential(url, cred)
@@ -150,10 +153,19 @@ def make_client(url):
 def query(client, db, kql, timeout_min=10):
     props = ClientRequestProperties()
     props.set_option("servertimeout", timedelta(minutes=timeout_min))
-    resp = client.execute_query(db, kql, props)
-    table = resp.primary_results[0]
-    cols = [c.column_name for c in table.columns]
-    return [{cols[i]: row[i] for i in range(len(cols))} for row in table]
+    for attempt in range(MAX_RETRIES):
+        try:
+            resp = client.execute_query(db, kql, props)
+            table = resp.primary_results[0]
+            cols = [c.column_name for c in table.columns]
+            return [{cols[i]: row[i] for i in range(len(cols))} for row in table]
+        except Exception as e:
+            if attempt < MAX_RETRIES - 1:
+                wait = RETRY_BACKOFF[attempt]
+                print(f"  Retry {attempt+1}/{MAX_RETRIES} after {wait}s: {e}", flush=True)
+                time.sleep(wait)
+            else:
+                raise
 
 # --- Adapt below for each task ---
 client = make_client("https://CLUSTER.kusto.windows.net")
@@ -463,8 +475,15 @@ For operations that take more than a few seconds:
 If Azure auth fails or returns 403:
 - Detect it immediately — do not retry the same failing call.
 - Check if it is a token expiry vs. a tenant mismatch (403 with "unauthorized" → tenant; 401 → token).
-- Instruct the user: `az login --tenant <TENANT> --scope "https://kusto.kusto.windows.net/.default"`
+- For 401 token expiry: the query-level retry loop should catch these automatically. If retries exhaust, instruct the user to re-authenticate.
+- For 403 tenant mismatch: instruct the user: `az login --tenant <TENANT> --scope "https://kusto.kusto.windows.net/.default"`
 - Wait for user confirmation, then continue the run.
+
+### Transient network errors (SSL EOF, connection reset)
+- `SSLEOFError`, `ConnectionResetError`, and similar socket-level failures are transient.
+- The query-level retry loop handles these automatically — do not treat them as fatal.
+- If all retries fail, the pipeline-level retry in the orchestrator gets another shot.
+- Only escalate to the user if both retry levels are exhausted.
 
 ### Query limits
 If a query times out, exceeds memory, or hits row limits:
@@ -541,6 +560,23 @@ These patterns consistently work well:
 - **Display name mapping**: Use a `DISPLAY` dict and a `dn()` helper to rename internal cohort/label names to user-facing display names. This keeps the data layer stable while the presentation layer adapts to user feedback.
 - **Tenant drift after az login**: Always verify tenant with `az account show` and `az account set` after login — `az login` alone is not sufficient when the user has multi-tenant subscriptions.
 - **Dark theme always**: Never generate light-themed dashboards. The radial-gradient dark theme with glass-morphism panels is the standard. See the Visual Identity section.
+- **Family / category merging**: When raw data has many low-level categories, merge small or closely related categories into user-facing families in the renderer (not the cache). Use a `FAMILY_MERGE` dict to map raw names → display families. This keeps the data cache stable while the presentation adapts.
+- **Skip empty entities**: Check for zero-data services/categories early and exclude them with a `SKIP_SERVICES` set. List what was excluded in the dashboard footer for transparency.
+- **Sub-item breakdown cards**: When merging categories, show a breakdown card per merged family listing its component items with their raw counts. This preserves the detail the merge hides.
+- **Waffle / proportion bars > stacked bars**: For showing category dominance within a list (e.g., SDK mix per API service), use horizontal waffle/proportion bars rather than stacked bar charts. They're easier to read when one category dominates.
+- **Doughnut for aggregate mix**: A doughnut chart with `cutout:'55%'` and a centered total works well for showing how 3–6 categories split an aggregate metric (calls, revenue, etc.).
+- **Horizontal bar for churn/retention**: Show retention or churn rates as horizontal bars with conditional coloring (red > 10%, amber > 5%, green < 5%). This is immediately scannable — no legend hunting.
+- **Funnel for persistence / drop-off**: When showing how a cohort narrows over time (new entrants → week +1 → week +2), use a funnel layout with progressively narrower bars. Include raw counts alongside percentages.
+- **Survival / step-line for retention trends**: For time-series retention data, use area-fill line charts with `fill: true` and mild tension (0.3). This gives a survival-curve feel that data science audiences expect.
+- **Maximally distinct color palettes**: Pick 4–6 colors spread across the hue wheel. Example palette: `#ff7043` (orange), `#29b6f6` (electric blue), `#ab47bc` (purple), `#66bb6a` (green), `#ffd54f` (amber), `#78909c` (slate). Avoid similar blues/grays next to each other.
+- **File overwrite via Move-Item**: Since `create_file` cannot overwrite, use `create_file` for a `_v2.py`, then `Move-Item -Force _v2.py original.py` to swap.
+- **Dynamic metric-based sorting**: Never hardcode category/cohort ordering in a parallel list. Compute sort orders dynamically from actual metric values after loading data (e.g., `sorted(cohorts, key=lambda c: data[c]["retention_rate"], reverse=True)`). This ensures entities land in the right position based on their data, not a hardcoded index. Users will complain if a low-performing cohort like REST appears in the wrong visual position.
+- **Dict-based color mapping > parallel lists**: Use `COHORT_COLOR_MAP = {"cohort": "#color"}` + a `color(c)` helper function instead of `COHORT_COLORS = [...]` parallel arrays. This decouples color from position and makes dynamic sorting work cleanly. When chart datasets need per-bar colors, build the color array from the sorted order: `[color(c) for c in sorted_cohorts]`.
+- **Per-dashboard sort orders**: For multi-dashboard investigations, compute a separate sort order for each dashboard based on the metric that dashboard focuses on — retention desc for the retention dashboard, churn asc (best first) for the churn dashboard, persistence desc for the entry persistence dashboard. Don't reuse one universal sort order across all dashboards.
+- **Retry at two levels**: Add retry with exponential backoff at both the individual query level (3 retries, 10s/20s/30s) and the pipeline level (3 retries, 30s/60s/90s). SSL EOF errors and 401 token-expiry are transient — retries self-heal them. Wrap the `query()` function in a retry loop with `time.sleep()` backoff, and wrap each pipeline call in the orchestrator with its own retry loop.
+- **SSL EOF errors on Kusto are transient**: `SSLEOFError` / `ConnectionResetError` during long batch queries against corporate Kusto clusters resolve on retry. The fix is retry logic, not network debugging. These are especially common on `cogsvc.kusto.windows.net` during multi-hour runs.
+- **Overnight orchestrator pattern**: For multi-pipeline runs (e.g., SDK mix + retention), create a `run_overnight.py` orchestrator with pipeline-level retry, configurable widened parameters via environment variables (`LOOKBACK_DAYS`, `LOOKBACK_WEEKS`, `MAX_SUBS_PER_TPID`), and structured progress output. This lets the user kick off a comprehensive data refresh and walk away.
+- **Project data isolation**: Real analytics project folders containing live Kusto data must be fully gitignored (`projects/sdk-adoption/`). Only demo folders with synthetic data belong in the repo. Use belt-and-suspenders `.gitignore` rules: both `projects/**/*.html` (broad) and `projects/sdk-adoption/` (specific). Never mention "uncommitted changes" for files in a gitignored project — the user expects those to be local-only.
 
 ## Capabilities
 The agent handles the full spectrum of Kusto analytics workflows:
