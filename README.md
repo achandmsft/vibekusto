@@ -128,26 +128,32 @@ Share the HTML file via email, Teams, or SharePoint. Recipients just open it —
 
 ---
 
-## Team Workflow
+## Sharing & Privacy
+
+> [!WARNING]
+> **Dashboard HTML files contain your actual query results — real data from your Kusto cluster.** yokusto is designed as a local-first tool. Dashboards live on your machine and should be shared privately within your organization via **SharePoint, Teams, or Outlook** — the same way you'd handle any sensitive export.
+
+If you choose to push dashboards to GitHub or enable GitHub Pages, **you are responsible for ensuring no private or proprietary data is exposed.** Proceed with extreme caution.
 
 <details>
-<summary>Version control with a private GitHub repo</summary>
+<summary>Advanced: team workflow with GitHub (read the warning above first)</summary>
+
+> [!CAUTION]
+> **GitHub Pages are always public** on Free/Pro/Team plans — even on private repos. Anyone with the URL can view your dashboards. Never enable Pages if your data contains PII, financial figures, internal metrics, or anything you wouldn't post on the open internet. [GitHub Enterprise Cloud](https://docs.github.com/en/enterprise-cloud@latest/pages/getting-started-with-github-pages/changing-the-visibility-of-your-github-pages-site) supports private Pages restricted to repo collaborators.
+
+**Safe setup (dashboards stay local, only scripts are version-controlled):**
 
 ```bash
 gh repo create my-yokusto --private --clone --template achandmsft/yokusto
 cd my-yokusto
-echo "projects/**/*.html" >> .gitignore   # keep dashboards local
+echo "projects/**/*.html" >> .gitignore   # keep dashboards out of git
 ```
 
-Dashboard HTML files contain your actual query data. The `.gitignore` rule keeps them local while scripts and KQL files are version-controlled. Share dashboards via Teams/SharePoint instead.
-
-**If you want public dashboards** (non-sensitive data only):
+**If you intentionally want public dashboards** (non-sensitive data only):
 
 ```bash
 gh api repos/<you>/my-yokusto/pages -X POST -f build_type=legacy -f source.branch=main -f source.path="/"
 ```
-
-> GitHub Pages on Free/Pro/Team plans are **always public**, even on private repos.
 
 **Pull upstream updates:**
 
