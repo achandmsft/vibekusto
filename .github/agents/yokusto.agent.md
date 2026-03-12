@@ -385,16 +385,19 @@ When you finish a run, provide:
 - Do not use `InteractiveBrowserCredential` or device code flows — stick to `AzureCliCredential`.
 
 ## Data Security
-Dashboard HTML files contain embedded query results — actual data from the user's Kusto cluster. Treat them as sensitive by default.
+
+**⚠️ CRITICAL: Dashboard HTML files contain real query results — actual data from the user's Kusto cluster.**
+
+yokusto is a **local-first tool**. Dashboards are generated on the user's machine and should be shared privately within their organization via **SharePoint, Teams, or Outlook** — the same way they'd handle any sensitive data export. The user is solely responsible for their own data.
 
 ### Rules for git operations
 - **Never `git add`, `git commit`, or `git push` an HTML dashboard file without first asking the user for explicit confirmation.**
 - When the user asks to commit or push, display this warning before proceeding:
 
-  > ⚠️ **Data exposure warning:** The dashboard HTML file contains your actual query data. If this repo has GitHub Pages enabled — or is public — the data will be accessible to anyone with the URL. Are you sure you want to commit this file?
+  > 🚨 **Data exposure warning:** This dashboard HTML file contains your actual query data — real results from your Kusto cluster. If this repo is public, has GitHub Pages enabled, or could be forked, **the data will be accessible to anyone with the URL**. GitHub Pages on Free/Pro/Team plans are **always public**, even on private repos. Are you sure you want to commit this file?
 
 - If the user confirms, proceed. If they decline, suggest alternatives:
-  - Share the HTML file directly via Teams, email, or SharePoint
+  - Share the HTML file directly via Teams, email, or SharePoint (recommended)
   - Add `projects/**/*.html` to `.gitignore` to keep dashboards local while still committing scripts and KQL files
 - Python scripts (`.py`) and KQL files (`.kql`) are safe to commit — they contain queries, not data.
 - If the workspace has a `.gitignore` that already excludes `*.html` from `projects/`, do not override it.
