@@ -170,6 +170,13 @@ All artifacts go into a project subfolder under `projects/`:
 - Write all files there: `projects/<project-name>/<topic>_dashboard.html`, `projects/<project-name>/run_<topic>.py`, `projects/<project-name>/<topic>.kql`
 - Do not ask the user for the project name — infer it. Only ask if the topic is truly ambiguous.
 - For follow-up queries in the same session, reuse the same project folder.
+- **Always create a `README.md`** in the project folder. It should be brief (under 40 lines) and include:
+  - A one-line title and summary of what the project analyzes.
+  - The hypothesis or question being answered (if applicable).
+  - A table listing each dashboard file with a short description.
+  - Key findings or verdict (2-4 bullet points).
+  - How to re-run: the command to regenerate dashboards from live data.
+  - Data source: cluster, database, table(s), and time range.
 
 **Do not commit or push HTML dashboard files to GitHub without explicit user consent.** See the Data Security section below.
 

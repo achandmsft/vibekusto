@@ -82,9 +82,9 @@ These dashboards were generated entirely by yokusto from a single natural-langua
 
 **What you get:** A dark-themed dashboard with 5 KPI cards ($12B total damage, 702 deaths, 1,842 injuries, 59K events, 67 states), a dual-axis monthly trend (bars for event count, lines for damage $ and deaths), horizontal bar ranking of the 12 deadliest storm types, stacked property-vs-crop damage by state, a doughnut chart of fatalities by cause, and a detailed breakdown table.
 
-📄 Output: [`storm_dashboard.html`](https://achandmsft.github.io/yokusto/projects/demo/storm_dashboard.html)
+📄 Output: [`storm_dashboard.html`](https://achandmsft.github.io/yokusto/projects/demo-basic/storm_dashboard.html)
 
-![Storm Dashboard Preview](projects/demo/images/storm_dashboard_preview.png)
+![Storm Dashboard Preview](projects/demo-basic/images/storm_dashboard_preview.png)
 
 ---
 
@@ -94,9 +94,9 @@ These dashboards were generated entirely by yokusto from a single natural-langua
 
 **What you get:** A midnight-blue dashboard with 5 KPI cards ($923M revenue, $490M cost, 46.9% margin, 3.8M transactions, 18K customers), a revenue/cost/margin trend line, top-10 countries horizontal bar, grouped revenue-vs-cost by product category, gender doughnut, education bar chart, and a top-15 cities table.
 
-📄 Output: [`sales_dashboard.html`](https://achandmsft.github.io/yokusto/projects/demo/sales_dashboard.html)
+📄 Output: [`sales_dashboard.html`](https://achandmsft.github.io/yokusto/projects/demo-basic/sales_dashboard.html)
 
-![Sales Dashboard Preview](projects/demo/images/sales_dashboard_preview.png)
+![Sales Dashboard Preview](projects/demo-basic/images/sales_dashboard_preview.png)
 
 ---
 
@@ -106,9 +106,21 @@ These dashboards were generated entirely by yokusto from a single natural-langua
 
 **What you get:** A GitHub-dark themed dashboard with seasonal KPI cards (Summer: 23K events/$3.5B, Spring: 18K/$5.1B, Fall: 11K/$2.4B, Winter: 6K/$915M), a stacked bar of the top 10 storm types across all 12 months, a polar area chart showing hour-of-day activity, a seasonal doughnut, average storm duration by type (droughts last 200+ hours!), and a state×month hotspot table.
 
-📄 Output: [`seasons_dashboard.html`](https://achandmsft.github.io/yokusto/projects/demo/seasons_dashboard.html)
+📄 Output: [`seasons_dashboard.html`](https://achandmsft.github.io/yokusto/projects/demo-basic/seasons_dashboard.html)
 
-![Seasons Dashboard Preview](projects/demo/images/seasons_dashboard_preview.png)
+![Seasons Dashboard Preview](projects/demo-basic/images/seasons_dashboard_preview.png)
+
+---
+
+### Demo 4 — YOLO Hypothesis Mode: Are Floods Disproportionately Destructive?
+
+> **Prompt:** `@yokusto I think flood events cause disproportionately more damage per event than other storm types. Prove or disprove this using https://help.kusto.windows.net, database Samples, table StormEvents`
+
+**What you get:** The agent enters **YOLO hypothesis mode** — it autonomously decomposes the hypothesis into 3 sub-questions, runs all the queries, and produces 4 dashboards: one per sub-question (damage ranking, per-event normalization, geographic hotspots) plus an executive summary with an overall verdict of **PARTIALLY SUPPORTED**.
+
+📄 Output: [`hypothesis_summary.html`](https://achandmsft.github.io/yokusto/projects/demo-hypothesis/hypothesis_summary.html) (+ 3 evidence dashboards)
+
+See the full project: [`projects/demo-hypothesis/`](projects/demo-hypothesis/)
 
 ---
 
@@ -150,7 +162,7 @@ Each Copilot Chat session becomes a self-contained project in a `projects/` subf
 
 Over time your workspace becomes a portfolio of analytics projects — all queryable, re-runnable, and shareable.
 
-> **Tip:** The `projects/demo/` folder is just the showcase. Delete it anytime with `rm -rf projects/demo` — the agent and setup files are unaffected.
+> **Tip:** The `projects/demo-basic/` and `projects/demo-hypothesis/` folders are just showcases. Delete them anytime — the agent and setup files are unaffected.
 
 ---
 
@@ -341,12 +353,19 @@ You need at least **Viewer** permissions on the Kusto cluster. Ask your cluster 
 └── prompts/
     └── yokusto.prompt.md          # Slash-command entry point
 projects/
-└── demo/                          # Showcase dashboards (safe to delete)
+├── demo-basic/                     # 3 showcase dashboards (safe to delete)
+│   ├── README.md
+│   ├── run_demos.py
+│   ├── storm_dashboard.html
+│   ├── sales_dashboard.html
+│   ├── seasons_dashboard.html
+│   └── images/
+└── demo-hypothesis/                # YOLO hypothesis mode demo (safe to delete)
     ├── README.md
-    ├── run_demos.py
-    ├── storm_dashboard.html
-    ├── sales_dashboard.html
-    ├── seasons_dashboard.html
-    └── images/
+    ├── run_hypothesis_demo.py
+    ├── hypothesis_summary.html
+    ├── hypothesis_01_ranking.html
+    ├── hypothesis_02_per_event.html
+    └── hypothesis_03_geographic.html
 README.md                          # This file
 ```

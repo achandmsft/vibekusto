@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hypothesis 03 — Geographic Hotspots: Where Is Flood Damage Concentrated?</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:#0f0f23;color:#e0e0e0;padding:24px}
+  h1{text-align:center;font-size:24px;margin-bottom:4px;background:linear-gradient(135deg,#42a5f5,#66bb6a);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .subtitle{text-align:center;color:#888;font-size:13px;margin-bottom:20px}
+  .question{text-align:center;font-size:16px;color:#ccc;margin-bottom:20px;font-style:italic;border-left:3px solid #ab47bc;padding:8px 16px;display:inline-block;width:100%}
+  .verdict{text-align:center;margin-bottom:24px;padding:16px 24px;border-radius:12px;width:100%}
+  .verdict.supported{background:linear-gradient(135deg,#1a3a1a,#2a4a2a);border:2px solid #66bb6a}
+  .verdict .badge{font-size:14px;font-weight:700;letter-spacing:2px;padding:4px 12px;border-radius:6px;display:inline-block;margin-bottom:8px}
+  .verdict.supported .badge{background:#66bb6a;color:#1a1a1a}
+  .verdict .summary{font-size:14px;color:#ccc}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+  .card{background:#1a1a2e;border-radius:12px;padding:20px;border:1px solid #2a2a4e}
+  .card h3{font-size:15px;color:#ccc;margin-bottom:12px}
+  .full{grid-column:1/-1}canvas{max-height:380px}
+  .kpi-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
+  .kpi{background:linear-gradient(135deg,#1a1a3e,#2a2a5e);border-radius:12px;padding:16px 24px;min-width:140px;text-align:center;border:1px solid #333366}
+  .kpi .value{font-size:28px;font-weight:800}
+  .kpi .label{font-size:11px;color:#aaa;margin-top:4px;text-transform:uppercase;letter-spacing:1px}
+  .kpi.orange .value{color:#ffa726}.kpi.blue .value{color:#42a5f5}.kpi.red .value{color:#ff6b6b}.kpi.green .value{color:#66bb6a}.kpi.purple .value{color:#ab47bc}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{text-align:left;padding:8px 10px;border-bottom:2px solid #333;color:#aaa;font-weight:600}
+  td{padding:7px 10px;border-bottom:1px solid #222}tr:hover{background:#1e1e3e}.right{text-align:right}
+  .footer{text-align:center;color:#555;font-size:12px;margin-top:20px}
+  .caveat{background:#1a1a2e;border-radius:8px;padding:16px;border-left:3px solid #ffa726;margin-top:20px;font-size:13px;color:#aaa}
+  .caveat h4{color:#ffa726;margin-bottom:8px;font-size:13px}
+</style>
+</head>
+<body>
+<h1>Hypothesis Dashboard 3 of 3</h1>
+<p class="subtitle">Hypothesis: Flood events cause disproportionately more damage per event than other storm types</p>
+<div class="question">Sub-question: Are there geographic hotspots driving the flood damage, or is it evenly distributed?</div>
+<div class="verdict supported">
+  <div class="badge">SUPPORTED</div>
+  <div class="summary">Flood damage is highly concentrated: the top 3 states (Missouri, Texas, Kansas) account for 53% of all flood damage. Missouri alone ($531.6M) represents 25%.</div>
+</div>
+<div class="kpi-row">
+  <div class="kpi purple"><div class="value">53%</div><div class="label">Top 3 States Share</div></div>
+  <div class="kpi orange"><div class="value">$531.6M</div><div class="label">Missouri (#1)</div></div>
+  <div class="kpi blue"><div class="value">$336.3M</div><div class="label">Texas (#2)</div></div>
+  <div class="kpi green"><div class="value">$267.8M</div><div class="label">Kansas (#3)</div></div>
+</div>
+<div class="grid">
+  <div class="card full"><h3>Flood Damage by State — Top 15</h3><canvas id="stChart"></canvas></div>
+  <div class="card"><h3>Cumulative Share of Flood Damage</h3><canvas id="cumChart"></canvas></div>
+  <div class="card"><h3>Flood Damage by State</h3><table>
+    <tr><th>State</th><th class="right">Damage</th><th class="right">Events</th><th class="right">%</th><th class="right">Deaths</th></tr>
+    <tr><td>Missouri</td><td class="right">$531.6M</td><td class="right">410</td><td class="right">24.9%</td><td class="right">2</td></tr>
+<tr><td>Texas</td><td class="right">$336.3M</td><td class="right">1,345</td><td class="right">15.7%</td><td class="right">46</td></tr>
+<tr><td>Kansas</td><td class="right">$267.8M</td><td class="right">397</td><td class="right">12.5%</td><td class="right">2</td></tr>
+<tr><td>Ohio</td><td class="right">$267.7M</td><td class="right">115</td><td class="right">12.5%</td><td class="right">0</td></tr>
+<tr><td>Minnesota</td><td class="right">$194.2M</td><td class="right">81</td><td class="right">9.1%</td><td class="right">8</td></tr>
+<tr><td>New Jersey</td><td class="right">$129.6M</td><td class="right">89</td><td class="right">6.1%</td><td class="right">3</td></tr>
+<tr><td>Wisconsin</td><td class="right">$117.3M</td><td class="right">73</td><td class="right">5.5%</td><td class="right">1</td></tr>
+<tr><td>Iowa</td><td class="right">$59.1M</td><td class="right">397</td><td class="right">2.8%</td><td class="right">1</td></tr>
+<tr><td>Washington</td><td class="right">$50.0M</td><td class="right">6</td><td class="right">2.3%</td><td class="right">2</td></tr>
+<tr><td>Maine</td><td class="right">$47.5M</td><td class="right">60</td><td class="right">2.2%</td><td class="right">2</td></tr>
+<tr><td>New York</td><td class="right">$42.6M</td><td class="right">137</td><td class="right">2.0%</td><td class="right">5</td></tr>
+<tr><td>Oklahoma</td><td class="right">$30.0M</td><td class="right">296</td><td class="right">1.4%</td><td class="right">6</td></tr>
+<tr><td>Pennsylvania</td><td class="right">$29.7M</td><td class="right">148</td><td class="right">1.4%</td><td class="right">0</td></tr>
+<tr><td>Illinois</td><td class="right">$17.4M</td><td class="right">172</td><td class="right">0.8%</td><td class="right">0</td></tr>
+<tr><td>Arizona</td><td class="right">$14.9M</td><td class="right">114</td><td class="right">0.7%</td><td class="right">7</td></tr>
+</table>
+  </div>
+  <div class="card full"><h3>Monthly Flood Damage Trend (2007)</h3><canvas id="moChart"></canvas></div>
+</div>
+<div class="caveat"><h4>Caveats</h4><ul>
+  <li>Geographic concentration means a few catastrophic events drive the national average.</li>
+  <li>Seasonal Jul–Aug spike suggests summer flooding is the primary driver.</li>
+  <li>Single year (2007) — patterns may vary across years.</li>
+</ul></div>
+<p class="footer">Generated by yokusto — YOLO Hypothesis Mode — https://help.kusto.windows.net / Samples / StormEvents</p>
+<script>
+const st=["Missouri", "Texas", "Kansas", "Ohio", "Minnesota", "New Jersey", "Wisconsin", "Iowa", "Washington", "Maine", "New York", "Oklahoma", "Pennsylvania", "Illinois", "Arizona"];const sd=[531602000, 336284000, 267844500, 267697000, 194190500, 129550000, 117310700, 59142000, 50037000, 47549500, 42619000, 29964000, 29683000, 17427500, 14894000];
+new Chart(document.getElementById('stChart'),{type:'bar',data:{labels:st,datasets:[{data:sd,backgroundColor:sd.map((d,i)=>i<3?'#26c6da':'#42a5f5')}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'$'+(c.raw/1e6).toFixed(1)+'M'}}},scales:{x:{ticks:{color:'#888',callback:v=>'$'+(v/1e6).toFixed(0)+'M'},grid:{color:'#222'}},y:{ticks:{color:'#ccc',font:{size:11}},grid:{color:'#222'}}}}});
+new Chart(document.getElementById('cumChart'),{type:'line',data:{labels:st,datasets:[{label:'Cumulative %',data:[24.9, 40.6, 53.2, 65.7, 74.8, 80.9, 86.4, 89.1, 91.5, 93.7, 95.7, 97.1, 98.5, 99.3, 100.0],borderColor:'#26c6da',backgroundColor:'rgba(38,198,218,0.1)',fill:true,tension:.3},{label:'80% line',data:Array(15).fill(80),borderColor:'#ff6b6b',borderDash:[6,4],pointRadius:0,borderWidth:2,fill:false}]},options:{responsive:true,plugins:{legend:{labels:{color:'#ccc'}}},scales:{x:{ticks:{color:'#888',maxRotation:45,font:{size:10}},grid:{color:'#222'}},y:{ticks:{color:'#888',callback:v=>v+'%'},grid:{color:'#222'},min:0,max:100}}}});
+const mn=["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];const md=[5800300, 1852000, 33216000, 213608000, 144812000, 296104000, 741912100, 721238100, 2665000, 8242000, 586000, 52201500];const me=[202, 94, 654, 458, 840, 911, 938, 804, 244, 163, 27, 140];
+new Chart(document.getElementById('moChart'),{type:'bar',data:{labels:mn,datasets:[{label:'Damage ($)',data:md,backgroundColor:md.map(d=>d>200000000?'#26c6da':'#42a5f5'),yAxisID:'y'},{label:'Events',data:me,type:'line',borderColor:'#ffa726',backgroundColor:'transparent',yAxisID:'y1',tension:.3,pointRadius:3}]},options:{responsive:true,plugins:{legend:{labels:{color:'#ccc'}}},scales:{x:{ticks:{color:'#888'},grid:{color:'#222'}},y:{position:'left',ticks:{color:'#888',callback:v=>'$'+(v/1e6).toFixed(0)+'M'},grid:{color:'#222'}},y1:{position:'right',ticks:{color:'#ffa726'},grid:{display:false}}}}});
+</script></body></html>
