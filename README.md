@@ -6,21 +6,17 @@ Ask plain English questions about any Azure Data Explorer (Kusto) cluster and ge
 
 ---
 
-## Quick Start (Python devs)
+## Quick Start
 
-Already have [**VS Code**](https://code.visualstudio.com/) + [**Copilot**](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot), [**Python 3.10+**](https://www.python.org/downloads/), and [**Azure CLI**](https://learn.microsoft.com/cli/azure/install-azure-cli)? Four commands:
+Already have [**VS Code**](https://code.visualstudio.com/) + [**Copilot**](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot), [**Python 3.10+**](https://www.python.org/downloads/), and [**Azure CLI**](https://learn.microsoft.com/cli/azure/install-azure-cli)? Three commands:
 
 ```bash
-# Create your own private repo from this template
-gh repo create my-yokusto --private --clone --template achandmsft/yokusto
-cd my-yokusto
+git clone https://github.com/achandmsft/yokusto.git && cd yokusto
 pip install azure-kusto-data azure-identity
 az login --scope "https://kusto.kusto.windows.net/.default"
 ```
 
-Open the folder in VS Code, type `@yokusto` in Copilot Chat, and go.
-
-> **Why private?** Most Kusto data is proprietary. A private repo keeps your queries, scripts, and dashboards confidential. See [Sharing Dashboards](#sharing-dashboards) for how to share results safely.
+Open the folder in VS Code, type `@yokusto` in Copilot Chat, and go. Everything stays on your machine — dashboards, scripts, queries. Share the HTML files however you like (email, Teams, SharePoint).
 
 ---
 <details>
@@ -122,39 +118,19 @@ These dashboards were generated entirely by yokusto from a single natural-langua
 
 ## Create Your Own Projects
 
-yokusto is designed as a **personal analytics workspace**. Create a private copy of this repo, and each Copilot Chat session becomes a self-contained project — with its own dashboards, queries, and Python scripts.
-
-### Setup (one time)
-
-```bash
-# Create a private repo from this template
-gh repo create my-yokusto --private --clone --template achandmsft/yokusto
-cd my-yokusto
-pip install azure-kusto-data azure-identity
-az login --scope "https://kusto.kusto.windows.net/.default"
-```
-
-> **No `gh` CLI?** Create a new private repo on GitHub, then:
-> ```bash
-> git clone --bare https://github.com/achandmsft/yokusto.git
-> cd yokusto.git
-> git push --mirror https://github.com/<you>/my-yokusto.git
-> cd .. && rm -rf yokusto.git
-> git clone https://github.com/<you>/my-yokusto.git
-> ```
+Each Copilot Chat session becomes a self-contained project in a `projects/` subfolder — with its own dashboards, queries, and Python scripts. Everything stays local on your machine.
 
 ### How it works
 
-1. **Open your repo in VS Code** and type `@yokusto` followed by your question.
-2. **The agent creates a project folder** under `projects/` automatically (e.g., `projects/q4-revenue-analysis/`).
-3. **Each project is self-contained** — the agent writes all artifacts into that folder:
+1. **Start a new chat session** — type `@yokusto` followed by your question. The agent creates a project folder under `projects/` automatically (e.g., `projects/q4-revenue-analysis/`).
+2. **Each project is self-contained** — the agent writes all artifacts into that folder:
    ```
    projects/q4-revenue-analysis/
    ├── run_q4_revenue.py              # Re-runnable Python script
    ├── q4_revenue_dashboard.html      # The visualization
    └── q4_revenue.kql                 # Working KQL queries
    ```
-4. **Push to main** and share dashboards (see [Sharing Dashboards](#sharing-dashboards) below).
+3. **Share the HTML file** — email it, drop it in Teams/Slack/SharePoint, or attach it to a ticket. Recipients just open it in a browser — no setup needed.
 
 ### Example workflow
 
@@ -172,19 +148,49 @@ az login --scope "https://kusto.kusto.windows.net/.default"
 → creates projects/daily-active-users/
 ```
 
-Over time your repo becomes a portfolio of analytics projects — all queryable, re-runnable, and shareable.
+Over time your workspace becomes a portfolio of analytics projects — all queryable, re-runnable, and shareable.
 
 > **Tip:** The `projects/demo/` folder is just the showcase. Delete it anytime with `rm -rf projects/demo` — the agent and setup files are unaffected.
 
-### Pulling upstream updates
+---
 
-To get new features from the original yokusto repo:
+### Advanced: Team workflow with a GitHub repo
+
+For teams that want version-controlled projects with shared history, push your workspace to a **private** GitHub repo.
+
+> **⚠️ IMPORTANT: Dashboard HTML files contain your actual query data.** If you enable GitHub Pages — even on a private repo — **the dashboards become public web pages visible to anyone with the URL.** Do not commit HTML dashboard files to GitHub if they contain sensitive or proprietary data.
+
+**Safe setup:**
+
+```bash
+# 1. Create a private repo
+gh repo create my-yokusto --private --clone --template achandmsft/yokusto
+cd my-yokusto
+
+# 2. Add a .gitignore to exclude dashboards from commits
+echo "projects/**/*.html" >> .gitignore
+```
+
+This keeps your Python scripts and KQL queries version-controlled while dashboard HTML files stay local-only. Share dashboards via Teams/SharePoint/email instead.
+
+**If you intentionally want public dashboards** (non-sensitive data only):
+
+```bash
+# Remove the HTML exclusion from .gitignore, then:
+gh api repos/<you>/my-yokusto/pages -X POST -f build_type=legacy -f source.branch=main -f source.path="/"
+```
+
+Every dashboard becomes a shareable URL:
+`https://<you>.github.io/my-yokusto/projects/<project-name>/<topic>_dashboard.html`
+
+> **Privacy reminder:** GitHub Pages on Free/Pro/Team plans are **always public**, even on private repos. [GitHub Enterprise Cloud](https://docs.github.com/en/enterprise-cloud@latest/pages/getting-started-with-github-pages/changing-the-visibility-of-your-github-pages-site) supports private Pages restricted to repo collaborators.
+
+**Pulling upstream updates:**
 
 ```bash
 git remote add upstream https://github.com/achandmsft/yokusto.git
-git remote set-url --push upstream DISABLE   # prevent accidental pushes
-git fetch upstream
-git merge upstream/main
+git remote set-url --push upstream DISABLE
+git fetch upstream && git merge upstream/main
 ```
 
 ---
@@ -284,30 +290,16 @@ projects/<project-name>/
 
 ## Sharing Dashboards
 
-Every dashboard is a **self-contained HTML file** — no server required, no dependencies. Choose the sharing method that fits your data sensitivity:
+Every dashboard is a **self-contained HTML file** — no server required, no dependencies. Recipients just double-click to open.
 
-### For private/proprietary data (recommended)
-
-| Method | How | Who can access |
+| Method | How | Best for |
 |---|---|---|
-| **Send the HTML file** | Email it, drop it in Teams/Slack, or attach to a ticket | Anyone you send it to — they just open it in a browser |
-| **SharePoint / OneDrive** | Upload the `.html` file to a shared folder | People with folder access |
-| **Teams channel** | Drag the file into a channel | Channel members |
+| **Email** | Attach the `.html` file | Quick one-off shares |
+| **Teams / Slack** | Drag the file into a channel or chat | Team collaboration |
+| **SharePoint / OneDrive** | Upload to a shared folder | Persistent access with org permissions |
+| **GitHub Pages** | Push to repo, enable Pages | Public dashboards only — see warning below |
 
-The HTML file contains embedded data and Chart.js from CDN — recipients just double-click to open. No Python, no Kusto access, no setup.
-
-### For public or non-sensitive data
-
-Enable GitHub Pages to auto-publish dashboards as live web pages:
-
-```bash
-gh api repos/<you>/my-yokusto/pages -X POST -f build_type=legacy -f source.branch=main -f source.path="/"
-```
-
-Every dashboard becomes a shareable URL:
-`https://<you>.github.io/my-yokusto/projects/<project-name>/<topic>_dashboard.html`
-
-> **Privacy note:** GitHub Pages on free/Pro plans are **always public**, even on private repos. Only use this for non-sensitive data. GitHub Enterprise Cloud supports [private Pages](https://docs.github.com/en/enterprise-cloud@latest/pages/getting-started-with-github-pages/changing-the-visibility-of-your-github-pages-site) restricted to repo collaborators.
+> **⚠️ GitHub Pages are always public** on Free/Pro/Team plans — even on private repos. Never push dashboard HTML files containing sensitive data to a GitHub repo with Pages enabled. The agent will warn you before committing HTML files.
 
 ---
 

@@ -168,6 +168,8 @@ All artifacts go into a project subfolder under `projects/`:
 - Do not ask the user for the project name — infer it. Only ask if the topic is truly ambiguous.
 - For follow-up queries in the same session, reuse the same project folder.
 
+**Do not commit or push HTML dashboard files to GitHub without explicit user consent.** See the Data Security section below.
+
 ### 9. Iterate intelligently
 For follow-up asks:
 - If only the visual changes, reuse the existing data if possible.
@@ -226,6 +228,24 @@ When you finish a run, provide:
 - Do not leave the task at the "here is a query" stage unless the user explicitly asked for only KQL.
 - Do not ask for confirmation before routine execution steps.
 - Do not use `InteractiveBrowserCredential` or device code flows — stick to `AzureCliCredential`.
+
+## Data Security
+Dashboard HTML files contain embedded query results — actual data from the user's Kusto cluster. Treat them as sensitive by default.
+
+### Rules for git operations
+- **Never `git add`, `git commit`, or `git push` an HTML dashboard file without first asking the user for explicit confirmation.**
+- When the user asks to commit or push, display this warning before proceeding:
+
+  > ⚠️ **Data exposure warning:** The dashboard HTML file contains your actual query data. If this repo has GitHub Pages enabled — or is public — the data will be accessible to anyone with the URL. Are you sure you want to commit this file?
+
+- If the user confirms, proceed. If they decline, suggest alternatives:
+  - Share the HTML file directly via Teams, email, or SharePoint
+  - Add `projects/**/*.html` to `.gitignore` to keep dashboards local while still committing scripts and KQL files
+- Python scripts (`.py`) and KQL files (`.kql`) are safe to commit — they contain queries, not data.
+- If the workspace has a `.gitignore` that already excludes `*.html` from `projects/`, do not override it.
+
+### When the user says "push to GitHub" or "commit everything"
+Do not silently include HTML files. Always call out that dashboard files contain data and confirm before including them.
 
 ## Heuristics from Prior Successful Runs
 These patterns consistently work well:
