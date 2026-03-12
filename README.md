@@ -18,7 +18,7 @@ az login --scope "https://kusto.kusto.windows.net/.default"
 
 Open the folder in VS Code, type `@yokusto` in Copilot Chat, and go.
 
-> **MUltiple Azure tenants?** Add `--tenant <TENANT_ID>` to the `az login` command.
+> **Multiple Azure tenants?** Add `--tenant <TENANT_ID>` to the `az login` command.
 
 ---
 
