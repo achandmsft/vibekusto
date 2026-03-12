@@ -8,15 +8,19 @@ Ask plain English questions about any Azure Data Explorer (Kusto) cluster and ge
 
 ## Quick Start (Python devs)
 
-Already have [**VS Code**](https://code.visualstudio.com/) + [**Copilot**](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot), [**Python 3.10+**](https://www.python.org/downloads/), and [**Azure CLI**](https://learn.microsoft.com/cli/azure/install-azure-cli)? Three commands:
+Already have [**VS Code**](https://code.visualstudio.com/) + [**Copilot**](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot), [**Python 3.10+**](https://www.python.org/downloads/), and [**Azure CLI**](https://learn.microsoft.com/cli/azure/install-azure-cli)? Four commands:
 
 ```bash
-git clone <this-repo> && cd yokusto
+# Create your own private repo from this template
+gh repo create my-yokusto --private --clone --template achandmsft/yokusto
+cd my-yokusto
 pip install azure-kusto-data azure-identity
 az login --scope "https://kusto.kusto.windows.net/.default"
 ```
 
 Open the folder in VS Code, type `@yokusto` in Copilot Chat, and go.
+
+> **Why private?** Most Kusto data is proprietary. A private repo keeps your queries, scripts, and dashboards confidential. See [Sharing Dashboards](#sharing-dashboards) for how to share results safely.
 
 ---
 <details>
@@ -118,12 +122,31 @@ These dashboards were generated entirely by yokusto from a single natural-langua
 
 ## Create Your Own Projects
 
-yokusto is designed as a **personal analytics workspace**. Fork this repo, and each Copilot Chat session becomes a self-contained project — with its own dashboards, queries, and Python scripts — that you can share via GitHub Pages.
+yokusto is designed as a **personal analytics workspace**. Create a private copy of this repo, and each Copilot Chat session becomes a self-contained project — with its own dashboards, queries, and Python scripts.
+
+### Setup (one time)
+
+```bash
+# Create a private repo from this template
+gh repo create my-yokusto --private --clone --template achandmsft/yokusto
+cd my-yokusto
+pip install azure-kusto-data azure-identity
+az login --scope "https://kusto.kusto.windows.net/.default"
+```
+
+> **No `gh` CLI?** Create a new private repo on GitHub, then:
+> ```bash
+> git clone --bare https://github.com/achandmsft/yokusto.git
+> cd yokusto.git
+> git push --mirror https://github.com/<you>/my-yokusto.git
+> cd .. && rm -rf yokusto.git
+> git clone https://github.com/<you>/my-yokusto.git
+> ```
 
 ### How it works
 
-1. **Fork this repo** — you get the yokusto agent + the demo project as a starting point.
-2. **Start a new chat session** — type `@yokusto` followed by your question. The agent creates a project folder under `projects/` automatically (e.g., `projects/q4-revenue-analysis/`).
+1. **Open your repo in VS Code** and type `@yokusto` followed by your question.
+2. **The agent creates a project folder** under `projects/` automatically (e.g., `projects/q4-revenue-analysis/`).
 3. **Each project is self-contained** — the agent writes all artifacts into that folder:
    ```
    projects/q4-revenue-analysis/
@@ -131,8 +154,7 @@ yokusto is designed as a **personal analytics workspace**. Fork this repo, and e
    ├── q4_revenue_dashboard.html      # The visualization
    └── q4_revenue.kql                 # Working KQL queries
    ```
-4. **Push to main** — GitHub Pages auto-publishes every project's dashboards.
-5. **Share the link** — send `https://<you>.github.io/<repo>/projects/q4-revenue-analysis/q4_revenue_dashboard.html` to leadership, colleagues, or customers.
+4. **Push to main** and share dashboards (see [Sharing Dashboards](#sharing-dashboards) below).
 
 ### Example workflow
 
@@ -153,6 +175,17 @@ yokusto is designed as a **personal analytics workspace**. Fork this repo, and e
 Over time your repo becomes a portfolio of analytics projects — all queryable, re-runnable, and shareable.
 
 > **Tip:** The `projects/demo/` folder is just the showcase. Delete it anytime with `rm -rf projects/demo` — the agent and setup files are unaffected.
+
+### Pulling upstream updates
+
+To get new features from the original yokusto repo:
+
+```bash
+git remote add upstream https://github.com/achandmsft/yokusto.git
+git remote set-url --push upstream DISABLE   # prevent accidental pushes
+git fetch upstream
+git merge upstream/main
+```
 
 ---
 
@@ -247,8 +280,34 @@ projects/<project-name>/
 └── <topic>.kql                 # Working KQL queries — paste into Kusto Explorer
 ```
 
-With GitHub Pages enabled, every dashboard is automatically published and shareable at:
-`https://<you>.github.io/<repo>/projects/<project-name>/<topic>_dashboard.html`
+---
+
+## Sharing Dashboards
+
+Every dashboard is a **self-contained HTML file** — no server required, no dependencies. Choose the sharing method that fits your data sensitivity:
+
+### For private/proprietary data (recommended)
+
+| Method | How | Who can access |
+|---|---|---|
+| **Send the HTML file** | Email it, drop it in Teams/Slack, or attach to a ticket | Anyone you send it to — they just open it in a browser |
+| **SharePoint / OneDrive** | Upload the `.html` file to a shared folder | People with folder access |
+| **Teams channel** | Drag the file into a channel | Channel members |
+
+The HTML file contains embedded data and Chart.js from CDN — recipients just double-click to open. No Python, no Kusto access, no setup.
+
+### For public or non-sensitive data
+
+Enable GitHub Pages to auto-publish dashboards as live web pages:
+
+```bash
+gh api repos/<you>/my-yokusto/pages -X POST -f build_type=legacy -f source.branch=main -f source.path="/"
+```
+
+Every dashboard becomes a shareable URL:
+`https://<you>.github.io/my-yokusto/projects/<project-name>/<topic>_dashboard.html`
+
+> **Privacy note:** GitHub Pages on free/Pro plans are **always public**, even on private repos. Only use this for non-sensitive data. GitHub Enterprise Cloud supports [private Pages](https://docs.github.com/en/enterprise-cloud@latest/pages/getting-started-with-github-pages/changing-the-visibility-of-your-github-pages-site) restricted to repo collaborators.
 
 ---
 
