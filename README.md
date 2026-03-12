@@ -20,7 +20,7 @@ pip install azure-kusto-data azure-identity
 az login --scope "https://kusto.kusto.windows.net/.default"
 ```
 
-Open in VS Code → type `@yokusto` in Copilot Chat → go.
+Open in VS Code → open Copilot Chat → select **yokusto** from the agent dropdown (top of the chat panel) → ask your question.
 
 <details>
 <summary>Dev Container / Codespaces setup</summary>
@@ -47,16 +47,17 @@ Open in VS Code → type `@yokusto` in Copilot Chat → go.
 
 ## The Three Modes
 
+> **How to invoke:** Open Copilot Chat (`Ctrl+Alt+I`), click the agent dropdown at the top of the chat panel, select **yokusto**, then type your question. You can also use the slash command `/yokusto ask` followed by your question.
+
 All examples below use the **free public cluster** `https://help.kusto.windows.net` — replace with your own cluster URL.
 
 ### 1. Visualize — ask a question, get a dashboard
 
 Best for: exploring data you haven't seen before, building reports, one-off analysis.
 
-```
-@yokusto Show me storm damage by state and event type
-from https://help.kusto.windows.net, database Samples, table StormEvents
-```
+> **Agent:** yokusto
+>
+> Show me storm damage by state and event type from https://help.kusto.windows.net, database Samples, table StormEvents
 
 ![Storm Dashboard](projects/demo-visualize/images/storm_dashboard_preview.png)
 
@@ -70,11 +71,11 @@ The agent discovers schema, writes KQL, runs it, and builds a self-contained HTM
 
 Best for: Kusto users who already have a query and want to discover what else the data can tell them.
 
-```
-@yokusto Here's a query I use:
-StormEvents | summarize count() by State | top 10 by count_
-Analyze this and show me what else is interesting
-```
+> **Agent:** yokusto
+>
+> Here's a query I use:
+> `StormEvents | summarize count() by State | top 10 by count_`
+> Analyze this and show me what else is interesting
 
 ![Query Exploration](projects/demo-explore/images/query_exploration_preview.png)
 
@@ -88,11 +89,9 @@ The agent runs your seed query, discovers the broader schema, and produces follo
 
 Best for: validating a claim with data, building an evidence-based argument, due diligence.
 
-```
-@yokusto I think flood events cause disproportionately more damage
-per event than other storm types. Prove or disprove this using
-https://help.kusto.windows.net, database Samples, table StormEvents
-```
+> **Agent:** yokusto
+>
+> I think flood events cause disproportionately more damage per event than other storm types. Prove or disprove this using https://help.kusto.windows.net, database Samples, table StormEvents
 
 ![Hypothesis Summary](projects/demo-investigate/images/hypothesis_summary_preview.png)
 
