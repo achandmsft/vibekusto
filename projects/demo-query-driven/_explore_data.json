@@ -1,0 +1,1359 @@
+{
+  "seed": [
+    {
+      "State": "TEXAS",
+      "EventCount": 4701
+    },
+    {
+      "State": "KANSAS",
+      "EventCount": 3166
+    },
+    {
+      "State": "IOWA",
+      "EventCount": 2337
+    },
+    {
+      "State": "ILLINOIS",
+      "EventCount": 2022
+    },
+    {
+      "State": "MISSOURI",
+      "EventCount": 2016
+    },
+    {
+      "State": "GEORGIA",
+      "EventCount": 1983
+    },
+    {
+      "State": "MINNESOTA",
+      "EventCount": 1881
+    },
+    {
+      "State": "WISCONSIN",
+      "EventCount": 1850
+    },
+    {
+      "State": "NEBRASKA",
+      "EventCount": 1766
+    },
+    {
+      "State": "NEW YORK",
+      "EventCount": 1750
+    }
+  ],
+  "q1_type_by_state": [
+    {
+      "State": "TEXAS",
+      "EventType": "Hail",
+      "Events": 1326,
+      "Damage": 65934500
+    },
+    {
+      "State": "TEXAS",
+      "EventType": "Flash Flood",
+      "Events": 1199,
+      "Damage": 324342000
+    },
+    {
+      "State": "KANSAS",
+      "EventType": "Hail",
+      "Events": 1109,
+      "Damage": 4690500
+    },
+    {
+      "State": "TEXAS",
+      "EventType": "Thunderstorm Wind",
+      "Events": 830,
+      "Damage": 23361200
+    },
+    {
+      "State": "NEBRASKA",
+      "EventType": "Hail",
+      "Events": 830,
+      "Damage": 31610300
+    },
+    {
+      "State": "MINNESOTA",
+      "EventType": "Hail",
+      "Events": 699,
+      "Damage": 35041500
+    },
+    {
+      "State": "GEORGIA",
+      "EventType": "Thunderstorm Wind",
+      "Events": 609,
+      "Damage": 9354450
+    },
+    {
+      "State": "IOWA",
+      "EventType": "Thunderstorm Wind",
+      "Events": 585,
+      "Damage": 6212300
+    },
+    {
+      "State": "GEORGIA",
+      "EventType": "Drought",
+      "Events": 533,
+      "Damage": 344000000
+    },
+    {
+      "State": "ILLINOIS",
+      "EventType": "Thunderstorm Wind",
+      "Events": 533,
+      "Damage": 11731000
+    },
+    {
+      "State": "NEW YORK",
+      "EventType": "Thunderstorm Wind",
+      "Events": 502,
+      "Damage": 3042000
+    },
+    {
+      "State": "KANSAS",
+      "EventType": "Thunderstorm Wind",
+      "Events": 476,
+      "Damage": 9039000
+    },
+    {
+      "State": "MISSOURI",
+      "EventType": "Hail",
+      "Events": 449,
+      "Damage": 120000
+    },
+    {
+      "State": "IOWA",
+      "EventType": "Hail",
+      "Events": 428,
+      "Damage": 3518000
+    },
+    {
+      "State": "WISCONSIN",
+      "EventType": "Thunderstorm Wind",
+      "Events": 416,
+      "Damage": 48708000
+    },
+    {
+      "State": "MISSOURI",
+      "EventType": "Thunderstorm Wind",
+      "Events": 357,
+      "Damage": 2554500
+    },
+    {
+      "State": "MINNESOTA",
+      "EventType": "Winter Storm",
+      "Events": 319,
+      "Damage": 0
+    },
+    {
+      "State": "MINNESOTA",
+      "EventType": "Thunderstorm Wind",
+      "Events": 317,
+      "Damage": 335300
+    },
+    {
+      "State": "WISCONSIN",
+      "EventType": "Winter Storm",
+      "Events": 310,
+      "Damage": 410000
+    },
+    {
+      "State": "WISCONSIN",
+      "EventType": "Hail",
+      "Events": 303,
+      "Damage": 46220500
+    },
+    {
+      "State": "NEW YORK",
+      "EventType": "Hail",
+      "Events": 301,
+      "Damage": 240000
+    },
+    {
+      "State": "NEBRASKA",
+      "EventType": "Thunderstorm Wind",
+      "Events": 297,
+      "Damage": 12466000
+    },
+    {
+      "State": "KANSAS",
+      "EventType": "Winter Weather",
+      "Events": 283,
+      "Damage": 18000
+    },
+    {
+      "State": "GEORGIA",
+      "EventType": "Hail",
+      "Events": 269,
+      "Damage": 19318100
+    },
+    {
+      "State": "IOWA",
+      "EventType": "Winter Weather",
+      "Events": 258,
+      "Damage": 0
+    },
+    {
+      "State": "KANSAS",
+      "EventType": "Flash Flood",
+      "Events": 256,
+      "Damage": 205733500
+    },
+    {
+      "State": "ILLINOIS",
+      "EventType": "Hail",
+      "Events": 251,
+      "Damage": 56000
+    },
+    {
+      "State": "MISSOURI",
+      "EventType": "Flash Flood",
+      "Events": 251,
+      "Damage": 18853000
+    },
+    {
+      "State": "ILLINOIS",
+      "EventType": "Winter Weather",
+      "Events": 231,
+      "Damage": 0
+    },
+    {
+      "State": "IOWA",
+      "EventType": "Flash Flood",
+      "Events": 223,
+      "Damage": 40249000
+    },
+    {
+      "State": "TEXAS",
+      "EventType": "Tornado",
+      "Events": 216,
+      "Damage": 94929500
+    },
+    {
+      "State": "ILLINOIS",
+      "EventType": "Frost/Freeze",
+      "Events": 207,
+      "Damage": 23403000
+    },
+    {
+      "State": "NEW YORK",
+      "EventType": "Winter Weather",
+      "Events": 191,
+      "Damage": 256000
+    },
+    {
+      "State": "IOWA",
+      "EventType": "Winter Storm",
+      "Events": 191,
+      "Damage": 18911000
+    },
+    {
+      "State": "TEXAS",
+      "EventType": "High Wind",
+      "Events": 190,
+      "Damage": 2573000
+    },
+    {
+      "State": "MINNESOTA",
+      "EventType": "Drought",
+      "Events": 184,
+      "Damage": 0
+    },
+    {
+      "State": "WISCONSIN",
+      "EventType": "Winter Weather",
+      "Events": 183,
+      "Damage": 365000
+    },
+    {
+      "State": "MISSOURI",
+      "EventType": "Frost/Freeze",
+      "Events": 182,
+      "Damage": 166323950
+    },
+    {
+      "State": "TEXAS",
+      "EventType": "Winter Weather",
+      "Events": 176,
+      "Damage": 2593000
+    },
+    {
+      "State": "IOWA",
+      "EventType": "Flood",
+      "Events": 174,
+      "Damage": 18893000
+    },
+    {
+      "State": "NEW YORK",
+      "EventType": "Winter Storm",
+      "Events": 170,
+      "Damage": 1110000
+    },
+    {
+      "State": "NEW YORK",
+      "EventType": "Heavy Snow",
+      "Events": 170,
+      "Damage": 1258000
+    },
+    {
+      "State": "KANSAS",
+      "EventType": "Tornado",
+      "Events": 161,
+      "Damage": 259476000
+    },
+    {
+      "State": "MISSOURI",
+      "EventType": "Flood",
+      "Events": 159,
+      "Damage": 512749000
+    },
+    {
+      "State": "MISSOURI",
+      "EventType": "Ice Storm",
+      "Events": 152,
+      "Damage": 373213000
+    },
+    {
+      "State": "TEXAS",
+      "EventType": "Flood",
+      "Events": 146,
+      "Damage": 11942000
+    },
+    {
+      "State": "KANSAS",
+      "EventType": "Flood",
+      "Events": 141,
+      "Damage": 62111000
+    },
+    {
+      "State": "ILLINOIS",
+      "EventType": "Ice Storm",
+      "Events": 129,
+      "Damage": 1613000
+    },
+    {
+      "State": "IOWA",
+      "EventType": "Ice Storm",
+      "Events": 128,
+      "Damage": 14014000
+    },
+    {
+      "State": "WISCONSIN",
+      "EventType": "Dense Fog",
+      "Events": 126,
+      "Damage": 0
+    }
+  ],
+  "q2_monthly_trend": [
+    {
+      "Month": "2007-01-01T00:00:00+00:00",
+      "State": "GEORGIA",
+      "Events": 38,
+      "Damage": 1785000
+    },
+    {
+      "Month": "2007-01-01T00:00:00+00:00",
+      "State": "ILLINOIS",
+      "Events": 77,
+      "Damage": 0
+    },
+    {
+      "Month": "2007-01-01T00:00:00+00:00",
+      "State": "IOWA",
+      "Events": 131,
+      "Damage": 0
+    },
+    {
+      "Month": "2007-01-01T00:00:00+00:00",
+      "State": "KANSAS",
+      "Events": 193,
+      "Damage": 32000
+    },
+    {
+      "Month": "2007-01-01T00:00:00+00:00",
+      "State": "MINNESOTA",
+      "Events": 65,
+      "Damage": 0
+    },
+    {
+      "Month": "2007-01-01T00:00:00+00:00",
+      "State": "MISSOURI",
+      "Events": 150,
+      "Damage": 355365000
+    },
+    {
+      "Month": "2007-01-01T00:00:00+00:00",
+      "State": "NEBRASKA",
+      "Events": 90,
+      "Damage": 0
+    },
+    {
+      "Month": "2007-01-01T00:00:00+00:00",
+      "State": "NEW YORK",
+      "Events": 166,
+      "Damage": 1014000
+    },
+    {
+      "Month": "2007-01-01T00:00:00+00:00",
+      "State": "TEXAS",
+      "Events": 388,
+      "Damage": 4892000
+    },
+    {
+      "Month": "2007-01-01T00:00:00+00:00",
+      "State": "WISCONSIN",
+      "Events": 86,
+      "Damage": 0
+    },
+    {
+      "Month": "2007-02-01T00:00:00+00:00",
+      "State": "GEORGIA",
+      "Events": 75,
+      "Damage": 756000
+    },
+    {
+      "Month": "2007-02-01T00:00:00+00:00",
+      "State": "ILLINOIS",
+      "Events": 242,
+      "Damage": 969000
+    },
+    {
+      "Month": "2007-02-01T00:00:00+00:00",
+      "State": "IOWA",
+      "Events": 243,
+      "Damage": 28740000
+    },
+    {
+      "Month": "2007-02-01T00:00:00+00:00",
+      "State": "KANSAS",
+      "Events": 217,
+      "Damage": 981500
+    },
+    {
+      "Month": "2007-02-01T00:00:00+00:00",
+      "State": "MINNESOTA",
+      "Events": 195,
+      "Damage": 0
+    },
+    {
+      "Month": "2007-02-01T00:00:00+00:00",
+      "State": "MISSOURI",
+      "Events": 117,
+      "Damage": 412000
+    },
+    {
+      "Month": "2007-02-01T00:00:00+00:00",
+      "State": "NEBRASKA",
+      "Events": 136,
+      "Damage": 30000
+    },
+    {
+      "Month": "2007-02-01T00:00:00+00:00",
+      "State": "NEW YORK",
+      "Events": 122,
+      "Damage": 5860000
+    },
+    {
+      "Month": "2007-02-01T00:00:00+00:00",
+      "State": "TEXAS",
+      "Events": 260,
+      "Damage": 3578000
+    },
+    {
+      "Month": "2007-02-01T00:00:00+00:00",
+      "State": "WISCONSIN",
+      "Events": 212,
+      "Damage": 347000
+    },
+    {
+      "Month": "2007-03-01T00:00:00+00:00",
+      "State": "GEORGIA",
+      "Events": 76,
+      "Damage": 149840250
+    },
+    {
+      "Month": "2007-03-01T00:00:00+00:00",
+      "State": "ILLINOIS",
+      "Events": 155,
+      "Damage": 1477000
+    },
+    {
+      "Month": "2007-03-01T00:00:00+00:00",
+      "State": "IOWA",
+      "Events": 240,
+      "Damage": 5653000
+    },
+    {
+      "Month": "2007-03-01T00:00:00+00:00",
+      "State": "KANSAS",
+      "Events": 202,
+      "Damage": 3334500
+    },
+    {
+      "Month": "2007-03-01T00:00:00+00:00",
+      "State": "MINNESOTA",
+      "Events": 143,
+      "Damage": 6895000
+    },
+    {
+      "Month": "2007-03-01T00:00:00+00:00",
+      "State": "MISSOURI",
+      "Events": 123,
+      "Damage": 1538000
+    },
+    {
+      "Month": "2007-03-01T00:00:00+00:00",
+      "State": "NEBRASKA",
+      "Events": 139,
+      "Damage": 1934250
+    },
+    {
+      "Month": "2007-03-01T00:00:00+00:00",
+      "State": "NEW YORK",
+      "Events": 158,
+      "Damage": 1206000
+    },
+    {
+      "Month": "2007-03-01T00:00:00+00:00",
+      "State": "TEXAS",
+      "Events": 630,
+      "Damage": 28937000
+    },
+    {
+      "Month": "2007-03-01T00:00:00+00:00",
+      "State": "WISCONSIN",
+      "Events": 177,
+      "Damage": 363000
+    },
+    {
+      "Month": "2007-04-01T00:00:00+00:00",
+      "State": "GEORGIA",
+      "Events": 230,
+      "Damage": 636950200
+    },
+    {
+      "Month": "2007-04-01T00:00:00+00:00",
+      "State": "ILLINOIS",
+      "Events": 271,
+      "Damage": 23521000
+    },
+    {
+      "Month": "2007-04-01T00:00:00+00:00",
+      "State": "IOWA",
+      "Events": 148,
+      "Damage": 7311000
+    },
+    {
+      "Month": "2007-04-01T00:00:00+00:00",
+      "State": "KANSAS",
+      "Events": 213,
+      "Damage": 41278500
+    },
+    {
+      "Month": "2007-04-01T00:00:00+00:00",
+      "State": "MINNESOTA",
+      "Events": 118,
+      "Damage": 0
+    },
+    {
+      "Month": "2007-04-01T00:00:00+00:00",
+      "State": "MISSOURI",
+      "Events": 406,
+      "Damage": 166503950
+    },
+    {
+      "Month": "2007-04-01T00:00:00+00:00",
+      "State": "NEBRASKA",
+      "Events": 128,
+      "Damage": 5734000
+    },
+    {
+      "Month": "2007-04-01T00:00:00+00:00",
+      "State": "NEW YORK",
+      "Events": 125,
+      "Damage": 37348000
+    },
+    {
+      "Month": "2007-04-01T00:00:00+00:00",
+      "State": "TEXAS",
+      "Events": 648,
+      "Damage": 114897000
+    },
+    {
+      "Month": "2007-04-01T00:00:00+00:00",
+      "State": "WISCONSIN",
+      "Events": 87,
+      "Damage": 319000
+    },
+    {
+      "Month": "2007-05-01T00:00:00+00:00",
+      "State": "GEORGIA",
+      "Events": 152,
+      "Damage": 21900000
+    },
+    {
+      "Month": "2007-05-01T00:00:00+00:00",
+      "State": "ILLINOIS",
+      "Events": 90,
+      "Damage": 2576000
+    },
+    {
+      "Month": "2007-05-01T00:00:00+00:00",
+      "State": "IOWA",
+      "Events": 172,
+      "Damage": 34269000
+    },
+    {
+      "Month": "2007-05-01T00:00:00+00:00",
+      "State": "KANSAS",
+      "Events": 868,
+      "Damage": 344746500
+    },
+    {
+      "Month": "2007-05-01T00:00:00+00:00",
+      "State": "MINNESOTA",
+      "Events": 142,
+      "Damage": 4015200
+    },
+    {
+      "Month": "2007-05-01T00:00:00+00:00",
+      "State": "MISSOURI",
+      "Events": 212,
+      "Damage": 12990000
+    },
+    {
+      "Month": "2007-05-01T00:00:00+00:00",
+      "State": "NEBRASKA",
+      "Events": 332,
+      "Damage": 11110800
+    },
+    {
+      "Month": "2007-05-01T00:00:00+00:00",
+      "State": "NEW YORK",
+      "Events": 45,
+      "Damage": 291000
+    },
+    {
+      "Month": "2007-05-01T00:00:00+00:00",
+      "State": "TEXAS",
+      "Events": 898,
+      "Damage": 13414200
+    },
+    {
+      "Month": "2007-05-01T00:00:00+00:00",
+      "State": "WISCONSIN",
+      "Events": 96,
+      "Damage": 344000
+    },
+    {
+      "Month": "2007-06-01T00:00:00+00:00",
+      "State": "GEORGIA",
+      "Events": 281,
+      "Damage": 21392100
+    },
+    {
+      "Month": "2007-06-01T00:00:00+00:00",
+      "State": "ILLINOIS",
+      "Events": 146,
+      "Damage": 1738000
+    },
+    {
+      "Month": "2007-06-01T00:00:00+00:00",
+      "State": "IOWA",
+      "Events": 278,
+      "Damage": 27596400
+    },
+    {
+      "Month": "2007-06-01T00:00:00+00:00",
+      "State": "KANSAS",
+      "Events": 354,
+      "Damage": 9822500
+    },
+    {
+      "Month": "2007-06-01T00:00:00+00:00",
+      "State": "MINNESOTA",
+      "Events": 376,
+      "Damage": 25097800
+    },
+    {
+      "Month": "2007-06-01T00:00:00+00:00",
+      "State": "MISSOURI",
+      "Events": 208,
+      "Damage": 8502000
+    },
+    {
+      "Month": "2007-06-01T00:00:00+00:00",
+      "State": "NEBRASKA",
+      "Events": 135,
+      "Damage": 3186000
+    },
+    {
+      "Month": "2007-06-01T00:00:00+00:00",
+      "State": "NEW YORK",
+      "Events": 319,
+      "Damage": 31462000
+    },
+    {
+      "Month": "2007-06-01T00:00:00+00:00",
+      "State": "TEXAS",
+      "Events": 839,
+      "Damage": 251154500
+    },
+    {
+      "Month": "2007-06-01T00:00:00+00:00",
+      "State": "WISCONSIN",
+      "Events": 272,
+      "Damage": 63343400
+    },
+    {
+      "Month": "2007-07-01T00:00:00+00:00",
+      "State": "GEORGIA",
+      "Events": 244,
+      "Damage": 6104200
+    },
+    {
+      "Month": "2007-07-01T00:00:00+00:00",
+      "State": "ILLINOIS",
+      "Events": 112,
+      "Damage": 3580500
+    },
+    {
+      "Month": "2007-07-01T00:00:00+00:00",
+      "State": "IOWA",
+      "Events": 258,
+      "Damage": 5461000
+    },
+    {
+      "Month": "2007-07-01T00:00:00+00:00",
+      "State": "KANSAS",
+      "Events": 191,
+      "Damage": 177328400
+    },
+    {
+      "Month": "2007-07-01T00:00:00+00:00",
+      "State": "MINNESOTA",
+      "Events": 139,
+      "Damage": 39000
+    },
+    {
+      "Month": "2007-07-01T00:00:00+00:00",
+      "State": "MISSOURI",
+      "Events": 57,
+      "Damage": 500601500
+    },
+    {
+      "Month": "2007-07-01T00:00:00+00:00",
+      "State": "NEBRASKA",
+      "Events": 185,
+      "Damage": 4469000
+    },
+    {
+      "Month": "2007-07-01T00:00:00+00:00",
+      "State": "NEW YORK",
+      "Events": 198,
+      "Damage": 800000
+    },
+    {
+      "Month": "2007-07-01T00:00:00+00:00",
+      "State": "TEXAS",
+      "Events": 449,
+      "Damage": 12823300
+    },
+    {
+      "Month": "2007-07-01T00:00:00+00:00",
+      "State": "WISCONSIN",
+      "Events": 197,
+      "Damage": 5016850
+    },
+    {
+      "Month": "2007-08-01T00:00:00+00:00",
+      "State": "GEORGIA",
+      "Events": 350,
+      "Damage": 5167250
+    },
+    {
+      "Month": "2007-08-01T00:00:00+00:00",
+      "State": "ILLINOIS",
+      "Events": 389,
+      "Damage": 22039000
+    },
+    {
+      "Month": "2007-08-01T00:00:00+00:00",
+      "State": "IOWA",
+      "Events": 373,
+      "Damage": 13281100
+    },
+    {
+      "Month": "2007-08-01T00:00:00+00:00",
+      "State": "KANSAS",
+      "Events": 371,
+      "Damage": 3221500
+    },
+    {
+      "Month": "2007-08-01T00:00:00+00:00",
+      "State": "MINNESOTA",
+      "Events": 375,
+      "Damage": 185053500
+    },
+    {
+      "Month": "2007-08-01T00:00:00+00:00",
+      "State": "MISSOURI",
+      "Events": 295,
+      "Damage": 18619000
+    },
+    {
+      "Month": "2007-08-01T00:00:00+00:00",
+      "State": "NEBRASKA",
+      "Events": 374,
+      "Damage": 28266000
+    },
+    {
+      "Month": "2007-08-01T00:00:00+00:00",
+      "State": "NEW YORK",
+      "Events": 247,
+      "Damage": 1612000
+    },
+    {
+      "Month": "2007-08-01T00:00:00+00:00",
+      "State": "TEXAS",
+      "Events": 203,
+      "Damage": 59597000
+    },
+    {
+      "Month": "2007-08-01T00:00:00+00:00",
+      "State": "WISCONSIN",
+      "Events": 280,
+      "Damage": 171554700
+    },
+    {
+      "Month": "2007-09-01T00:00:00+00:00",
+      "State": "GEORGIA",
+      "Events": 190,
+      "Damage": 344116500
+    },
+    {
+      "Month": "2007-09-01T00:00:00+00:00",
+      "State": "ILLINOIS",
+      "Events": 50,
+      "Damage": 65590000
+    },
+    {
+      "Month": "2007-09-01T00:00:00+00:00",
+      "State": "IOWA",
+      "Events": 127,
+      "Damage": 7027200
+    },
+    {
+      "Month": "2007-09-01T00:00:00+00:00",
+      "State": "KANSAS",
+      "Events": 147,
+      "Damage": 124500
+    },
+    {
+      "Month": "2007-09-01T00:00:00+00:00",
+      "State": "MINNESOTA",
+      "Events": 154,
+      "Damage": 10841800
+    },
+    {
+      "Month": "2007-09-01T00:00:00+00:00",
+      "State": "MISSOURI",
+      "Events": 73,
+      "Damage": 12323000
+    },
+    {
+      "Month": "2007-09-01T00:00:00+00:00",
+      "State": "NEBRASKA",
+      "Events": 95,
+      "Damage": 10409000
+    },
+    {
+      "Month": "2007-09-01T00:00:00+00:00",
+      "State": "NEW YORK",
+      "Events": 45,
+      "Damage": 536000
+    },
+    {
+      "Month": "2007-09-01T00:00:00+00:00",
+      "State": "TEXAS",
+      "Events": 156,
+      "Damage": 50215000
+    },
+    {
+      "Month": "2007-09-01T00:00:00+00:00",
+      "State": "WISCONSIN",
+      "Events": 99,
+      "Damage": 131800
+    },
+    {
+      "Month": "2007-10-01T00:00:00+00:00",
+      "State": "GEORGIA",
+      "Events": 113,
+      "Damage": 15000
+    },
+    {
+      "Month": "2007-10-01T00:00:00+00:00",
+      "State": "ILLINOIS",
+      "Events": 125,
+      "Damage": 582000
+    },
+    {
+      "Month": "2007-10-01T00:00:00+00:00",
+      "State": "IOWA",
+      "Events": 48,
+      "Damage": 1835000
+    },
+    {
+      "Month": "2007-10-01T00:00:00+00:00",
+      "State": "KANSAS",
+      "Events": 114,
+      "Damage": 1535100
+    },
+    {
+      "Month": "2007-10-01T00:00:00+00:00",
+      "State": "MINNESOTA",
+      "Events": 20,
+      "Damage": 3010000
+    },
+    {
+      "Month": "2007-10-01T00:00:00+00:00",
+      "State": "MISSOURI",
+      "Events": 155,
+      "Damage": 2124000
+    },
+    {
+      "Month": "2007-10-01T00:00:00+00:00",
+      "State": "NEBRASKA",
+      "Events": 39,
+      "Damage": 337000
+    },
+    {
+      "Month": "2007-10-01T00:00:00+00:00",
+      "State": "NEW YORK",
+      "Events": 27,
+      "Damage": 9000
+    },
+    {
+      "Month": "2007-10-01T00:00:00+00:00",
+      "State": "TEXAS",
+      "Events": 92,
+      "Damage": 30225700
+    },
+    {
+      "Month": "2007-10-01T00:00:00+00:00",
+      "State": "WISCONSIN",
+      "Events": 43,
+      "Damage": 8800250
+    },
+    {
+      "Month": "2007-11-01T00:00:00+00:00",
+      "State": "GEORGIA",
+      "Events": 106,
+      "Damage": 25500
+    },
+    {
+      "Month": "2007-11-01T00:00:00+00:00",
+      "State": "ILLINOIS",
+      "Events": 19,
+      "Damage": 0
+    },
+    {
+      "Month": "2007-11-01T00:00:00+00:00",
+      "State": "IOWA",
+      "Events": 9,
+      "Damage": 0
+    },
+    {
+      "Month": "2007-11-01T00:00:00+00:00",
+      "State": "KANSAS",
+      "Events": 45,
+      "Damage": 0
+    },
+    {
+      "Month": "2007-11-01T00:00:00+00:00",
+      "State": "MINNESOTA",
+      "Events": 29,
+      "Damage": 0
+    },
+    {
+      "Month": "2007-11-01T00:00:00+00:00",
+      "State": "MISSOURI",
+      "Events": 21,
+      "Damage": 1000
+    },
+    {
+      "Month": "2007-11-01T00:00:00+00:00",
+      "State": "NEW YORK",
+      "Events": 26,
+      "Damage": 45000
+    },
+    {
+      "Month": "2007-11-01T00:00:00+00:00",
+      "State": "TEXAS",
+      "Events": 61,
+      "Damage": 150000
+    },
+    {
+      "Month": "2007-11-01T00:00:00+00:00",
+      "State": "WISCONSIN",
+      "Events": 60,
+      "Damage": 105000
+    },
+    {
+      "Month": "2007-12-01T00:00:00+00:00",
+      "State": "GEORGIA",
+      "Events": 128,
+      "Damage": 2396750
+    },
+    {
+      "Month": "2007-12-01T00:00:00+00:00",
+      "State": "ILLINOIS",
+      "Events": 346,
+      "Damage": 787000
+    },
+    {
+      "Month": "2007-12-01T00:00:00+00:00",
+      "State": "IOWA",
+      "Events": 310,
+      "Damage": 4225000
+    },
+    {
+      "Month": "2007-12-01T00:00:00+00:00",
+      "State": "KANSAS",
+      "Events": 251,
+      "Damage": 156425000
+    },
+    {
+      "Month": "2007-12-01T00:00:00+00:00",
+      "State": "MINNESOTA",
+      "Events": 125,
+      "Damage": 0
+    },
+    {
+      "Month": "2007-12-01T00:00:00+00:00",
+      "State": "MISSOURI",
+      "Events": 199,
+      "Damage": 17908000
+    },
+    {
+      "Month": "2007-12-01T00:00:00+00:00",
+      "State": "NEBRASKA",
+      "Events": 113,
+      "Damage": 4880000
+    },
+    {
+      "Month": "2007-12-01T00:00:00+00:00",
+      "State": "NEW YORK",
+      "Events": 272,
+      "Damage": 7951000
+    },
+    {
+      "Month": "2007-12-01T00:00:00+00:00",
+      "State": "TEXAS",
+      "Events": 77,
+      "Damage": 2203000
+    },
+    {
+      "Month": "2007-12-01T00:00:00+00:00",
+      "State": "WISCONSIN",
+      "Events": 241,
+      "Damage": 365000
+    }
+  ],
+  "q3_damage_ratio": [
+    {
+      "State": "CALIFORNIA",
+      "Events": 898,
+      "TotalDamage": 2801954600,
+      "Deaths": 61,
+      "DamagePerEvent": 3120216
+    },
+    {
+      "State": "WASHINGTON",
+      "Events": 261,
+      "TotalDamage": 181877500,
+      "Deaths": 17,
+      "DamagePerEvent": 696848
+    },
+    {
+      "State": "MISSISSIPPI",
+      "Events": 1218,
+      "TotalDamage": 802890160,
+      "Deaths": 2,
+      "DamagePerEvent": 659187
+    },
+    {
+      "State": "GEORGIA",
+      "Events": 1983,
+      "TotalDamage": 1190448750,
+      "Deaths": 22,
+      "DamagePerEvent": 600327
+    },
+    {
+      "State": "MISSOURI",
+      "Events": 2016,
+      "TotalDamage": 1096887450,
+      "Deaths": 23,
+      "DamagePerEvent": 544090
+    },
+    {
+      "State": "OKLAHOMA",
+      "Events": 1716,
+      "TotalDamage": 916557300,
+      "Deaths": 46,
+      "DamagePerEvent": 534124
+    },
+    {
+      "State": "NORTH DAKOTA",
+      "Events": 905,
+      "TotalDamage": 342460100,
+      "Deaths": 5,
+      "DamagePerEvent": 378408
+    },
+    {
+      "State": "FLORIDA",
+      "Events": 1042,
+      "TotalDamage": 379455260,
+      "Deaths": 62,
+      "DamagePerEvent": 364160
+    },
+    {
+      "State": "OHIO",
+      "Events": 1233,
+      "TotalDamage": 417989500,
+      "Deaths": 3,
+      "DamagePerEvent": 339002
+    },
+    {
+      "State": "KANSAS",
+      "Events": 3166,
+      "TotalDamage": 738830000,
+      "Deaths": 31,
+      "DamagePerEvent": 233363
+    },
+    {
+      "State": "ALABAMA",
+      "Events": 1315,
+      "TotalDamage": 299875250,
+      "Deaths": 31,
+      "DamagePerEvent": 228042
+    },
+    {
+      "State": "OREGON",
+      "Events": 423,
+      "TotalDamage": 85939000,
+      "Deaths": 6,
+      "DamagePerEvent": 203165
+    },
+    {
+      "State": "WISCONSIN",
+      "Events": 1850,
+      "TotalDamage": 250690000,
+      "Deaths": 18,
+      "DamagePerEvent": 135508
+    },
+    {
+      "State": "NEW JERSEY",
+      "Events": 1044,
+      "TotalDamage": 133670000,
+      "Deaths": 18,
+      "DamagePerEvent": 128036
+    },
+    {
+      "State": "MINNESOTA",
+      "Events": 1881,
+      "TotalDamage": 234952300,
+      "Deaths": 13,
+      "DamagePerEvent": 124908
+    }
+  ],
+  "q4_hourly": [
+    {
+      "Hour": 0,
+      "Events": 2275
+    },
+    {
+      "Hour": 1,
+      "Events": 496
+    },
+    {
+      "Hour": 2,
+      "Events": 591
+    },
+    {
+      "Hour": 3,
+      "Events": 658
+    },
+    {
+      "Hour": 4,
+      "Events": 728
+    },
+    {
+      "Hour": 5,
+      "Events": 378
+    },
+    {
+      "Hour": 6,
+      "Events": 646
+    },
+    {
+      "Hour": 7,
+      "Events": 406
+    },
+    {
+      "Hour": 8,
+      "Events": 513
+    },
+    {
+      "Hour": 9,
+      "Events": 547
+    },
+    {
+      "Hour": 10,
+      "Events": 523
+    },
+    {
+      "Hour": 11,
+      "Events": 544
+    },
+    {
+      "Hour": 12,
+      "Events": 957
+    },
+    {
+      "Hour": 13,
+      "Events": 934
+    },
+    {
+      "Hour": 14,
+      "Events": 1251
+    },
+    {
+      "Hour": 15,
+      "Events": 1567
+    },
+    {
+      "Hour": 16,
+      "Events": 1747
+    },
+    {
+      "Hour": 17,
+      "Events": 1847
+    },
+    {
+      "Hour": 18,
+      "Events": 1832
+    },
+    {
+      "Hour": 19,
+      "Events": 1387
+    },
+    {
+      "Hour": 20,
+      "Events": 1199
+    },
+    {
+      "Hour": 21,
+      "Events": 854
+    },
+    {
+      "Hour": 22,
+      "Events": 960
+    },
+    {
+      "Hour": 23,
+      "Events": 632
+    }
+  ],
+  "q5_diversity": [
+    {
+      "State": "TEXAS",
+      "EventTypes": 27,
+      "Events": 4701,
+      "Damage": 572086700
+    },
+    {
+      "State": "KANSAS",
+      "EventTypes": 21,
+      "Events": 3166,
+      "Damage": 738830000
+    },
+    {
+      "State": "IOWA",
+      "EventTypes": 19,
+      "Events": 2337,
+      "Damage": 135398700
+    },
+    {
+      "State": "ILLINOIS",
+      "EventTypes": 23,
+      "Events": 2022,
+      "Damage": 122859500
+    },
+    {
+      "State": "MISSOURI",
+      "EventTypes": 20,
+      "Events": 2016,
+      "Damage": 1096887450
+    },
+    {
+      "State": "GEORGIA",
+      "EventTypes": 24,
+      "Events": 1983,
+      "Damage": 1190448750
+    },
+    {
+      "State": "MINNESOTA",
+      "EventTypes": 19,
+      "Events": 1881,
+      "Damage": 234952300
+    },
+    {
+      "State": "WISCONSIN",
+      "EventTypes": 21,
+      "Events": 1850,
+      "Damage": 250690000
+    },
+    {
+      "State": "NEBRASKA",
+      "EventTypes": 16,
+      "Events": 1766,
+      "Damage": 70356050
+    },
+    {
+      "State": "NEW YORK",
+      "EventTypes": 21,
+      "Events": 1750,
+      "Damage": 88134000
+    },
+    {
+      "State": "NORTH CAROLINA",
+      "EventTypes": 23,
+      "Events": 1721,
+      "Damage": 172728000
+    },
+    {
+      "State": "OKLAHOMA",
+      "EventTypes": 20,
+      "Events": 1716,
+      "Damage": 916557300
+    },
+    {
+      "State": "PENNSYLVANIA",
+      "EventTypes": 25,
+      "Events": 1687,
+      "Damage": 47333000
+    },
+    {
+      "State": "COLORADO",
+      "EventTypes": 19,
+      "Events": 1654,
+      "Damage": 10391950
+    },
+    {
+      "State": "VIRGINIA",
+      "EventTypes": 21,
+      "Events": 1647,
+      "Damage": 165732850
+    }
+  ]
+}

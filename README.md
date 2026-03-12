@@ -106,7 +106,21 @@ State a hypothesis and the agent autonomously decomposes it, gathers evidence ac
 
 ---
 
-> **Want to try?** Paste either prompt into Copilot Chat with `@yokusto` — or make up your own. The agent discovers schema, writes KQL, runs it, and builds the dashboard automatically.
+### Demo 3 — Query-Driven Exploration (start from existing KQL)
+
+Already have a KQL query? Paste it and the agent expands outward — analyzing patterns, generating follow-up questions, and building a dashboard.
+
+> **Prompt:** `@yokusto Here's a query I use: StormEvents | summarize count() by State | top 10 by count_ — analyze this and show me what else is interesting`
+
+![Query Exploration Preview](projects/demo-query-driven/images/query_exploration_preview.png)
+
+**What you get:** The agent runs your seed query, discovers the full schema, and autonomously produces 5 follow-up analyses: storm type breakdown by state, monthly trends, damage-per-event ranking (California: $3.1M/event!), hourly patterns, and a diversity overview — plus suggested next questions.
+
+📄 [Open live dashboard](https://achandmsft.github.io/yokusto/projects/demo-query-driven/query_exploration_dashboard.html) · [Full project](projects/demo-query-driven/)
+
+---
+
+> **Want to try?** Paste any prompt above into Copilot Chat with `@yokusto` — or make up your own. The agent discovers schema, writes KQL, runs it, and builds the dashboard automatically.
 
 ---
 
@@ -144,7 +158,7 @@ Each Copilot Chat session becomes a self-contained project in a `projects/` subf
 
 Over time your workspace becomes a portfolio of analytics projects — all queryable, re-runnable, and shareable.
 
-> **Tip:** The `projects/demo-basic/` and `projects/demo-hypothesis/` folders are just showcases. Delete them anytime — the agent and setup files are unaffected.
+> **Tip:** The `projects/demo-basic/`, `projects/demo-query-driven/`, and `projects/demo-hypothesis/` folders are just showcases. Delete them anytime — the agent and setup files are unaffected.
 
 ---
 
@@ -341,6 +355,11 @@ projects/
 │   ├── storm_dashboard.html
 │   ├── sales_dashboard.html
 │   ├── seasons_dashboard.html
+│   └── images/
+├── demo-query-driven/              # Query-driven exploration demo (safe to delete)
+│   ├── README.md
+│   ├── run_query_exploration.py
+│   ├── query_exploration_dashboard.html
 │   └── images/
 └── demo-hypothesis/                # YOLO hypothesis mode demo (safe to delete)
     ├── README.md

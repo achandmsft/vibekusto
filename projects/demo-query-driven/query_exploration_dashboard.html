@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Query-Driven Exploration — Storm Events by State</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0d1117;color:#c9d1d9;font-family:'Segoe UI',system-ui,sans-serif;padding:24px;max-width:1280px;margin:0 auto}
+h1{color:#58a6ff;font-size:2rem;text-align:center;margin-bottom:4px}
+.subtitle{text-align:center;color:#8b949e;margin-bottom:8px;font-size:0.95rem}
+.seed-box{background:#161b22;border:2px solid #30363d;border-radius:12px;padding:20px;margin:16px 0 24px;text-align:center}
+.seed-box code{background:#1f2937;color:#7ee787;padding:8px 16px;border-radius:6px;font-size:1.05rem;display:inline-block;margin:8px 0}
+.seed-label{color:#8b949e;font-size:0.85rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.kpis{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;margin:20px 0}
+.kpi{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:16px 24px;text-align:center;min-width:160px;flex:1;max-width:220px}
+.kpi .val{font-size:1.8rem;font-weight:800;color:#58a6ff}
+.kpi .val.orange{color:#f0883e}
+.kpi .val.green{color:#7ee787}
+.kpi .val.purple{color:#bc8cff}
+.kpi .label{font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;color:#8b949e;margin-top:4px}
+.section{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:20px;margin:20px 0}
+.section h3{color:#58a6ff;margin-bottom:6px;font-size:1.1rem}
+.section .question{color:#f0883e;font-style:italic;margin-bottom:14px;font-size:0.92rem}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:800px){.grid{grid-template-columns:1fr}}
+canvas{max-height:350px}
+table{width:100%;border-collapse:collapse;margin-top:10px;font-size:0.88rem}
+th{background:#21262d;color:#58a6ff;padding:8px;text-align:left;border-bottom:2px solid #30363d}
+td{padding:7px 8px;border-bottom:1px solid #21262d}
+tr:hover{background:#1c2128}
+.follow-up{background:#1c2128;border:1px solid #f0883e44;border-radius:10px;padding:18px;margin:20px 0}
+.follow-up h3{color:#f0883e;margin-bottom:10px}
+.follow-up ul{padding-left:20px}
+.follow-up li{margin:8px 0;color:#c9d1d9}
+.footer{text-align:center;color:#484f58;font-size:0.8rem;margin-top:30px;padding:16px 0;border-top:1px solid #21262d}
+</style>
+</head>
+<body>
+
+<h1>Query-Driven Exploration — Storm Events</h1>
+<p class="subtitle">Starting from a simple seed query, yokusto explored 5 follow-up angles automatically</p>
+
+<div class="seed-box">
+  <div class="seed-label">Seed Query</div>
+  <code>StormEvents | summarize count() by State | top 10 by count_</code>
+  <div style="color:#8b949e;margin-top:8px;font-size:0.85rem">From this one query, the agent discovered schema, analyzed patterns, and produced 5 follow-up visualizations</div>
+</div>
+
+<div class="kpis">
+  <div class="kpi"><div class="val">Texas</div><div class="label">#1 State</div></div>
+  <div class="kpi"><div class="val orange">4,701</div><div class="label">Events in Texas</div></div>
+  <div class="kpi"><div class="val green">23,472</div><div class="label">Top-10 Total</div></div>
+  <div class="kpi"><div class="val purple">California</div><div class="label">Costliest per Event</div></div>
+  <div class="kpi"><div class="val">$3.1M</div><div class="label">Damage / Event</div></div>
+</div>
+
+<div class="grid">
+
+<!-- Chart 1: Stacked bar - storm types by state -->
+<div class="section">
+  <h3>Follow-Up 1 — Storm Types by State</h3>
+  <div class="question">"What storm types dominate in the top 10 states?"</div>
+  <canvas id="chart1"></canvas>
+</div>
+
+<!-- Chart 2: Monthly trend -->
+<div class="section">
+  <h3>Follow-Up 2 — Monthly Event Trend</h3>
+  <div class="question">"How does the event count change month by month?"</div>
+  <canvas id="chart2"></canvas>
+</div>
+
+<!-- Chart 3: Damage per event -->
+<div class="section">
+  <h3>Follow-Up 3 — Damage Efficiency</h3>
+  <div class="question">"Which states have the highest damage per event?"</div>
+  <canvas id="chart3"></canvas>
+</div>
+
+<!-- Chart 4: Hourly pattern -->
+<div class="section">
+  <h3>Follow-Up 4 — Hour of Day Pattern</h3>
+  <div class="question">"When do storms happen during the day?"</div>
+  <canvas id="chart4"></canvas>
+</div>
+
+</div>
+
+<!-- Table: Seed results + diversity -->
+<div class="section">
+  <h3>Follow-Up 5 — State Overview: Events, Diversity & Damage</h3>
+  <div class="question">"How diverse are storm types across the top states?"</div>
+  <table>
+    <thead><tr><th>State</th><th>Events</th><th>Storm Types</th><th>Total Damage</th><th>Damage/Event</th></tr></thead>
+    <tbody>
+      <tr><td>Texas</td><td>4,701</td><td>27</td><td>$572.1M</td><td>$122K</td></tr>
+      <tr><td>Kansas</td><td>3,166</td><td>21</td><td>$738.8M</td><td>$233K</td></tr>
+      <tr><td>Iowa</td><td>2,337</td><td>19</td><td>$135.4M</td><td>$58K</td></tr>
+      <tr><td>Illinois</td><td>2,022</td><td>23</td><td>$122.9M</td><td>$61K</td></tr>
+      <tr><td>Missouri</td><td>2,016</td><td>20</td><td>$1.1B</td><td>$544K</td></tr>
+      <tr><td>Georgia</td><td>1,983</td><td>24</td><td>$1.2B</td><td>$600K</td></tr>
+      <tr><td>Minnesota</td><td>1,881</td><td>19</td><td>$235.0M</td><td>$125K</td></tr>
+      <tr><td>Wisconsin</td><td>1,850</td><td>21</td><td>$250.7M</td><td>$136K</td></tr>
+      <tr><td>Nebraska</td><td>1,766</td><td>16</td><td>$70.4M</td><td>$40K</td></tr>
+      <tr><td>New York</td><td>1,750</td><td>21</td><td>$88.1M</td><td>$50K</td></tr>
+      <tr><td>North Carolina</td><td>1,721</td><td>23</td><td>$172.7M</td><td>$100K</td></tr>
+      <tr><td>Oklahoma</td><td>1,716</td><td>20</td><td>$916.6M</td><td>$534K</td></tr>
+      <tr><td>Pennsylvania</td><td>1,687</td><td>25</td><td>$47.3M</td><td>$28K</td></tr>
+      <tr><td>Colorado</td><td>1,654</td><td>19</td><td>$10.4M</td><td>$6K</td></tr>
+      <tr><td>Virginia</td><td>1,647</td><td>21</td><td>$165.7M</td><td>$101K</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="follow-up">
+  <h3>What yokusto would suggest next</h3>
+  <ul>
+    <li><strong>"California has $3.1M damage per event but only 898 events — what's causing that?"</strong> → drill into CA's event types</li>
+    <li><strong>"The midnight spike is unusual — are those overnight tornadoes or reporting artifacts?"</strong> → filter hour 0 by event type</li>
+    <li><strong>"Texas has 27 storm types — which ones cause the most damage?"</strong> → TX-specific breakdown</li>
+    <li><strong>"The summer peak is obvious — but does damage peak at the same time?"</strong> → overlay damage $ on the monthly trend</li>
+  </ul>
+</div>
+
+<p class="footer">Generated by yokusto — Query-Driven Exploration Mode — help.kusto.windows.net / Samples / StormEvents</p>
+
+<script>
+// Chart 1: Stacked bar - types by state
+const states1 = [{"State": "TEXAS", "EventCount": 4701}, {"State": "KANSAS", "EventCount": 3166}, {"State": "IOWA", "EventCount": 2337}, {"State": "ILLINOIS", "EventCount": 2022}, {"State": "MISSOURI", "EventCount": 2016}, {"State": "GEORGIA", "EventCount": 1983}, {"State": "MINNESOTA", "EventCount": 1881}, {"State": "WISCONSIN", "EventCount": 1850}, {"State": "NEBRASKA", "EventCount": 1766}, {"State": "NEW YORK", "EventCount": 1750}];
+const stateNames = states1.map(s => s.State.replace(/\b\w/g, c => c.toUpperCase()).replace(/ \w/g, c => c.toUpperCase()));
+const topTypes = ["Hail", "Thunderstorm Wind", "Flash Flood", "Winter Weather", "Winter Storm", "Drought", "Flood", "Ice Storm"];
+const palette = ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40", "#C9CBCF", "#7BC8A4"];
+const matrix = {"TEXAS": {"Hail": 1326, "Flash Flood": 1199, "Thunderstorm Wind": 830, "Winter Weather": 176, "Flood": 146}, "KANSAS": {"Hail": 1109, "Thunderstorm Wind": 476, "Winter Weather": 283, "Flash Flood": 256, "Flood": 141}, "NEBRASKA": {"Hail": 830, "Thunderstorm Wind": 297}, "MINNESOTA": {"Hail": 699, "Winter Storm": 319, "Thunderstorm Wind": 317, "Drought": 184}, "GEORGIA": {"Thunderstorm Wind": 609, "Drought": 533, "Hail": 269}, "IOWA": {"Thunderstorm Wind": 585, "Hail": 428, "Winter Weather": 258, "Flash Flood": 223, "Winter Storm": 191, "Flood": 174, "Ice Storm": 128}, "ILLINOIS": {"Thunderstorm Wind": 533, "Hail": 251, "Winter Weather": 231, "Ice Storm": 129}, "NEW YORK": {"Thunderstorm Wind": 502, "Hail": 301, "Winter Weather": 191, "Winter Storm": 170}, "MISSOURI": {"Hail": 449, "Thunderstorm Wind": 357, "Flash Flood": 251, "Flood": 159, "Ice Storm": 152}, "WISCONSIN": {"Thunderstorm Wind": 416, "Winter Storm": 310, "Hail": 303, "Winter Weather": 183}};
+
+new Chart(document.getElementById('chart1'), {
+  type: 'bar',
+  data: {
+    labels: stateNames,
+    datasets: topTypes.map((t, i) => ({
+      label: t,
+      data: states1.map(s => (matrix[s.State] || {})[t] || 0),
+      backgroundColor: palette[i % palette.length]
+    }))
+  },
+  options: {
+    responsive: true, indexAxis: 'y', scales: { x: { stacked: true, ticks:{color:'#8b949e'}, grid:{color:'#21262d'} }, y: { stacked: true, ticks:{color:'#c9d1d9'}, grid:{display:false} } },
+    plugins: { legend: { labels: { color:'#c9d1d9', font:{size:10} } } }
+  }
+});
+
+// Chart 2: Monthly trend
+const months = ["2007-01", "2007-02", "2007-03", "2007-04", "2007-05", "2007-06", "2007-07", "2007-08", "2007-09", "2007-10", "2007-11", "2007-12"];
+const monthCounts = [1384, 1819, 2043, 2374, 3007, 3208, 2030, 3257, 1136, 776, 376, 2062];
+new Chart(document.getElementById('chart2'), {
+  type: 'line',
+  data: {
+    labels: months,
+    datasets: [{ label: 'Events', data: monthCounts, borderColor: '#58a6ff', backgroundColor: '#58a6ff33', fill: true, tension: 0.3, pointRadius: 4 }]
+  },
+  options: { responsive: true, scales: { x:{ticks:{color:'#8b949e'},grid:{color:'#21262d'}}, y:{ticks:{color:'#8b949e'},grid:{color:'#21262d'}} }, plugins: { legend:{display:false} } }
+});
+
+// Chart 3: Damage per event (horizontal bar)
+const dpeStates = ["California", "Washington", "Mississippi", "Georgia", "Missouri", "Oklahoma", "North Dakota", "Florida", "Ohio", "Kansas"];
+const dpeValues = [3120216, 696848, 659187, 600327, 544090, 534124, 378408, 364160, 339002, 233363];
+new Chart(document.getElementById('chart3'), {
+  type: 'bar',
+  data: {
+    labels: dpeStates,
+    datasets: [{ label: 'Damage per Event ($)', data: dpeValues, backgroundColor: '#f0883e' }]
+  },
+  options: { responsive: true, indexAxis: 'y', scales: { x:{ticks:{color:'#8b949e',callback:v=>'$'+(v/1e6).toFixed(1)+'M'},grid:{color:'#21262d'}}, y:{ticks:{color:'#c9d1d9'},grid:{display:false}} }, plugins:{legend:{display:false}} }
+});
+
+// Chart 4: Polar area - hourly
+const hourData = [2275, 496, 591, 658, 728, 378, 646, 406, 513, 547, 523, 544, 957, 934, 1251, 1567, 1747, 1847, 1832, 1387, 1199, 854, 960, 632];
+const hourLabels = Array.from({length:24}, (_,i) => i.toString().padStart(2,'0')+':00');
+new Chart(document.getElementById('chart4'), {
+  type: 'polarArea',
+  data: {
+    labels: hourLabels,
+    datasets: [{ data: hourData, backgroundColor: hourData.map((_,i)=>`hsla(${i*15},70%,55%,0.6)`), borderColor: hourData.map((_,i)=>`hsla(${i*15},70%,55%,1)`) }]
+  },
+  options: { responsive: true, scales: { r:{ticks:{color:'#8b949e',backdropColor:'transparent'},grid:{color:'#21262d33'}} }, plugins: { legend:{display:false} } }
+});
+</script>
+
+</body></html>
