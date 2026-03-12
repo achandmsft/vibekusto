@@ -14,13 +14,37 @@ The user should not need Kusto knowledge, Kusto Explorer, or a heavyweight exten
 
 ## Primary Goal
 Given a natural-language ask or an existing KQL query about one or more Kusto clusters:
-1. Infer the likely workflow.
+1. Classify the user's intent (see Mode Selection below).
 2. Discover enough schema to answer the question correctly.
 3. Generate and run the smallest practical Python + KQL implementation.
 4. Handle errors and limitations autonomously.
-5. Produce a self-contained HTML output with useful tables and charts.
+5. Produce the appropriate output (single dashboard or multi-dashboard investigation).
 6. Proactively suggest follow-up questions the user might want answered from the data.
 7. Iterate on follow-up requests without restarting the whole process.
+
+## Mode Selection
+Before doing any work, classify the user's request into one of two modes. This is a semantic judgment — no keyword is required.
+
+**Visualization mode** (default) — the user wants to *see* data:
+- Descriptive questions: "show me", "how many", "what are the top", "build a dashboard of"
+- The request describes *what* to display, not *what to prove*
+- There is no claim to validate — just a desire to explore or summarize
+- Output: **1 dashboard**
+
+**Hypothesis mode** — the user states a *testable claim* and wants evidence:
+- The request contains an assertion: "I think X causes Y", "floods are worse than other storms", "this metric is declining"
+- The user asks for validation: "prove", "disprove", "is this true", "validate whether"
+- Causal or comparative framing: "more than", "disproportionately", "driven by", "because of"
+- Steering toward a verdict: "what's the story", "find evidence for/against", "is this getting worse"
+- Output: **N evidence dashboards + 1 executive summary** (see Hypothesis-Driven Exploration below)
+
+**How to decide:** Ask yourself — *"Is there a claim I could stamp SUPPORTED or NOT SUPPORTED?"* If yes → hypothesis mode. If the user is just asking to see data without asserting anything → visualization mode.
+
+**Ambiguous cases:** If the request could go either way (e.g., "explore storm damage"), default to visualization mode. After delivering the dashboard, suggest a hypothesis the data could test: *"Interesting — it looks like floods cause 2× more damage per event. Want me to investigate whether that holds up?"* This lets the user opt in naturally.
+
+**Explicit override:** The user can always force a mode:
+- "just show me the data" → visualization mode regardless of phrasing
+- "investigate this" or "prove/disprove this" → hypothesis mode regardless of phrasing
 
 ## Operating Mode
 Default to yolo mode.
@@ -246,8 +270,8 @@ When the user picks one or more questions (by number or rephrased):
 **Step 5 — Offer the next round**
 After delivering the dashboard, offer another round of questions — now informed by both the seed query and the answers just produced. The user can keep exploring iteratively or stop at any point.
 
-### Yolo mode: hypothesis-driven exploration
-When the user provides a seed query with a steering hint about what matters to them — e.g., "show me why this matters", "prove this is a problem", "find evidence for X", "validate whether Y is true" — switch to autonomous hypothesis-driven exploration. Do not present a menu of questions. Instead:
+### Hypothesis-driven exploration
+When Mode Selection (above) classifies the request as hypothesis mode, switch to autonomous hypothesis-driven exploration. Do not present a menu of questions. Instead:
 
 **Step 1 — Form a hypothesis**
 From the seed query results and the user's steering prompt, formulate a specific, testable hypothesis. State it clearly to the user, e.g.:
@@ -296,16 +320,6 @@ Based on the combined findings, propose 1-2 follow-up hypotheses that naturally 
 - If it was refuted: "The data suggests [alternative pattern] — want me to investigate that instead?"
 
 The user can accept a follow-up hypothesis, steer in a different direction, adjust N, or stop.
-
-**Trigger phrases for yolo mode:**
-- "just explore this and show me what's interesting"
-- "show me why this matters"
-- "prove this is a problem"
-- "is this getting worse?"
-- "find evidence for/against X"
-- "validate whether X"
-- "what's the story in this data?"
-- Any steering hint about importance, evidence, proof, or hypothesis
 
 ### Handling partial or broken queries
 If the user's KQL query has errors or references objects that don't exist:
