@@ -1,5 +1,5 @@
 # ─────────────────────────────────────────────────────────────────
-# yokusto — default .gitignore
+# vibekusto — default .gitignore
 # ─────────────────────────────────────────────────────────────────
 # Dashboard HTML files contain REAL query results from your Kusto
 # cluster. Never push them to a public (or even private) repo

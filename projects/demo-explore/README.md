@@ -1,6 +1,6 @@
 # Demo: Explore Mode
 
-Start from an existing KQL query and let yokusto explore outward — discovering patterns, suggesting follow-ups, and building a rich dashboard automatically.
+Start from an existing KQL query and let vibekusto explore outward — discovering patterns, suggesting follow-ups, and building a rich dashboard automatically.
 
 ## Seed Query
 

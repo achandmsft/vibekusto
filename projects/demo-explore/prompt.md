@@ -1,6 +1,6 @@
 # Reproducible Prompt — Demo Explore
 
-Paste the prompt below into yokusto to recreate this project from scratch.
+Paste the prompt below into vibekusto to recreate this project from scratch.
 
 ## Prompt
 

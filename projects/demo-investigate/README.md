@@ -1,6 +1,6 @@
 # Demo: Investigate Mode
 
-This project demonstrates **yokusto's Investigate mode** — autonomous, evidence-based data exploration that tests a hypothesis with multiple dashboards.
+This project demonstrates **vibekusto's Investigate mode** — autonomous, evidence-based data exploration that tests a hypothesis with multiple dashboards.
 
 ## Hypothesis
 

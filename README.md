@@ -1,6 +1,6 @@
-# yokusto — Talk to Kusto Clusters in Plain English
+# vibekusto — Talk to Kusto Clusters in Plain English
 
-yokusto — a GitHub Copilot chat agent that turns plain-English questions about your Azure Data Explorer data into rich, shareable HTML dashboards. No KQL required.
+vibekusto — a GitHub Copilot chat agent that turns plain-English questions about your Azure Data Explorer data into rich, shareable HTML dashboards. No KQL required.
 
 Three modes depending on what you need:
 
@@ -15,12 +15,12 @@ Three modes depending on what you need:
 ## Quick Start
 
 ```bash
-git clone https://github.com/achandmsft/yokusto.git && cd yokusto
+git clone https://github.com/achandmsft/vibekusto.git && cd vibekusto
 pip install azure-kusto-data azure-identity
 az login --scope "https://kusto.kusto.windows.net/.default"
 ```
 
-Open in VS Code → open Copilot Chat → select **yokusto** from the agent dropdown (top of the chat panel) → ask your question.
+Open in VS Code → open Copilot Chat → select **vibekusto** from the agent dropdown (top of the chat panel) → ask your question.
 
 <details>
 <summary>Dev Container / Codespaces setup</summary>
@@ -47,7 +47,7 @@ Open in VS Code → open Copilot Chat → select **yokusto** from the agent drop
 
 ## The Three Modes
 
-> **How to invoke:** Open Copilot Chat (`Ctrl+Alt+I`), click the agent dropdown at the top of the chat panel, select **yokusto**, then type your question. You can also use the slash command `/yokusto ask` followed by your question.
+> **How to invoke:** Open Copilot Chat (`Ctrl+Alt+I`), click the agent dropdown at the top of the chat panel, select **vibekusto**, then type your question. You can also use the slash command `/vibekusto ask` followed by your question.
 
 All examples below use the **free public cluster** `https://help.kusto.windows.net` — replace with your own cluster URL.
 
@@ -55,7 +55,7 @@ All examples below use the **free public cluster** `https://help.kusto.windows.n
 
 Best for: exploring data you haven't seen before, building reports, one-off analysis.
 
-> **Agent:** yokusto
+> **Agent:** vibekusto
 >
 > Show me storm damage by state and event type from https://help.kusto.windows.net, database Samples, table StormEvents
 
@@ -63,7 +63,7 @@ Best for: exploring data you haven't seen before, building reports, one-off anal
 
 The agent discovers schema, writes KQL, runs it, and builds a self-contained HTML dashboard — KPI cards, charts, tables. One prompt, one dashboard.
 
-📄 [Live demo](https://achandmsft.github.io/yokusto/projects/demo-visualize/storm_dashboard.html) · [Project files](projects/demo-visualize/)
+📄 [Live demo](https://achandmsft.github.io/vibekusto/projects/demo-visualize/storm_dashboard.html) · [Project files](projects/demo-visualize/)
 
 ---
 
@@ -71,7 +71,7 @@ The agent discovers schema, writes KQL, runs it, and builds a self-contained HTM
 
 Best for: Kusto users who already have a query and want to discover what else the data can tell them.
 
-> **Agent:** yokusto
+> **Agent:** vibekusto
 >
 > Here's a query I use:
 > `StormEvents | summarize count() by State | top 10 by count_`
@@ -81,7 +81,7 @@ Best for: Kusto users who already have a query and want to discover what else th
 
 The agent runs your seed query, discovers the broader schema, and produces follow-up analyses automatically — then suggests next questions.
 
-📄 [Live demo](https://achandmsft.github.io/yokusto/projects/demo-explore/query_exploration_dashboard.html) · [Project files](projects/demo-explore/)
+📄 [Live demo](https://achandmsft.github.io/vibekusto/projects/demo-explore/query_exploration_dashboard.html) · [Project files](projects/demo-explore/)
 
 ---
 
@@ -89,7 +89,7 @@ The agent runs your seed query, discovers the broader schema, and produces follo
 
 Best for: validating a claim with data, building an evidence-based argument, due diligence.
 
-> **Agent:** yokusto
+> **Agent:** vibekusto
 >
 > I think flood events cause disproportionately more damage per event than other storm types. Prove or disprove this using https://help.kusto.windows.net, database Samples, table StormEvents
 
@@ -97,7 +97,7 @@ Best for: validating a claim with data, building an evidence-based argument, due
 
 The agent decomposes your claim into sub-questions, gathers evidence for and against, and delivers a verdict across multiple dashboards.
 
-📄 [Live demo](https://achandmsft.github.io/yokusto/projects/demo-investigate/hypothesis_summary.html) · [Project files](projects/demo-investigate/)
+📄 [Live demo](https://achandmsft.github.io/vibekusto/projects/demo-investigate/hypothesis_summary.html) · [Project files](projects/demo-investigate/)
 
 ---
 
@@ -134,7 +134,7 @@ Share the HTML file via email, Teams, or SharePoint. Recipients just open it —
 ## Sharing & Privacy
 
 > [!WARNING]
-> **Dashboard HTML files contain your actual query results — real data from your Kusto cluster.** yokusto is designed as a local-first tool. Dashboards live on your machine and should be shared privately within your organization via **SharePoint, Teams, or Outlook** — the same way you'd handle any sensitive export.
+> **Dashboard HTML files contain your actual query results — real data from your Kusto cluster.** vibekusto is designed as a local-first tool. Dashboards live on your machine and should be shared privately within your organization via **SharePoint, Teams, or Outlook** — the same way you'd handle any sensitive export.
 
 If you choose to push dashboards to GitHub or enable GitHub Pages, **you are responsible for ensuring no private or proprietary data is exposed.** Proceed with extreme caution.
 
@@ -147,21 +147,21 @@ If you choose to push dashboards to GitHub or enable GitHub Pages, **you are res
 **Safe setup (dashboards stay local, only scripts are version-controlled):**
 
 ```bash
-gh repo create my-yokusto --private --clone --template achandmsft/yokusto
-cd my-yokusto
+gh repo create my-vibekusto --private --clone --template achandmsft/vibekusto
+cd my-vibekusto
 echo "projects/**/*.html" >> .gitignore   # keep dashboards out of git
 ```
 
 **If you intentionally want public dashboards** (non-sensitive data only):
 
 ```bash
-gh api repos/<you>/my-yokusto/pages -X POST -f build_type=legacy -f source.branch=main -f source.path="/"
+gh api repos/<you>/my-vibekusto/pages -X POST -f build_type=legacy -f source.branch=main -f source.path="/"
 ```
 
 **Pull upstream updates:**
 
 ```bash
-git remote add upstream https://github.com/achandmsft/yokusto.git
+git remote add upstream https://github.com/achandmsft/vibekusto.git
 git remote set-url --push upstream DISABLE
 git fetch upstream && git merge upstream/main
 ```
@@ -176,20 +176,20 @@ git fetch upstream && git merge upstream/main
 |---|---|
 | 403 Forbidden | Wrong tenant: `az login --tenant <TENANT_ID> --scope "https://kusto.kusto.windows.net/.default"` |
 | ModuleNotFoundError | `pip install azure-kusto-data azure-identity` |
-| Agent not visible | Check `.github/agents/yokusto.agent.md` exists, reload VS Code |
+| Agent not visible | Check `.github/agents/vibekusto.agent.md` exists, reload VS Code |
 | Query timeout | Agent handles this automatically; try a smaller time range if it persists |
 
 ---
 
 <details>
-<summary>Why is yokusto an agent and not a skill?</summary>
+<summary>Why is vibekusto an agent and not a skill?</summary>
 
-GitHub Copilot offers two extension points: **agents** (user-invoked, with their own identity and tools) and **skills** (reusable knowledge modules that agents can call). yokusto is a single agent — not an agent wrapping a skill — and this is a deliberate choice.
+GitHub Copilot offers two extension points: **agents** (user-invoked, with their own identity and tools) and **skills** (reusable knowledge modules that agents can call). vibekusto is a single agent — not an agent wrapping a skill — and this is a deliberate choice.
 
 | Factor | Agent + Skill (split) | Single Agent (current) |
 |---|---|---|
-| **Reusability** | The skill could be invoked by other agents | yokusto's knowledge is highly specific (Kusto → HTML dashboards via Python) — no other agent would realistically invoke it |
-| **Context loading** | Skill instructions only load when matched by description heuristics | Agent instructions only load when the user selects yokusto — same effect, no matching ambiguity |
+| **Reusability** | The skill could be invoked by other agents | vibekusto's knowledge is highly specific (Kusto → HTML dashboards via Python) — no other agent would realistically invoke it |
+| **Context loading** | Skill instructions only load when matched by description heuristics | Agent instructions only load when the user selects vibekusto — same effect, no matching ambiguity |
 | **Coherence** | Orchestration and domain knowledge split across two files — easy to drift apart | Everything in one place — mode selection, workflow, heuristics, visual style, error recovery all reference each other |
 | **Mode selection** | The orchestrator would parse intent then delegate to the skill — adding a handoff seam | Mode selection flows directly into execution with no artificial boundary |
 | **Maintenance** | Two files to keep in sync | One file, one source of truth |
@@ -198,7 +198,7 @@ GitHub Copilot offers two extension points: **agents** (user-invoked, with their
 - If other agents needed Kusto → dashboard capabilities (e.g., a cost-optimization agent that also queries Kusto and renders HTML). The shared knowledge would become a genuine reusable skill.
 - If the agent definition grew past ~1,000 lines and started hitting context window limits. At ~550 lines today, it's well within bounds.
 
-For now, yokusto is a single-purpose agent with tightly coupled orchestration and domain knowledge. Splitting would add complexity without real reuse. The architecture can be revisited if shared Kusto querying capabilities are needed later.
+For now, vibekusto is a single-purpose agent with tightly coupled orchestration and domain knowledge. Splitting would add complexity without real reuse. The architecture can be revisited if shared Kusto querying capabilities are needed later.
 
 </details>
 
@@ -207,8 +207,8 @@ For now, yokusto is a single-purpose agent with tightly coupled orchestration an
 ## Files
 
 ```
-.github/agents/yokusto.agent.md    # Agent definition (the brain)
-.github/prompts/yokusto.prompt.md  # Slash-command entry point
+.github/agents/vibekusto.agent.md    # Agent definition (the brain)
+.github/prompts/vibekusto.prompt.md  # Slash-command entry point
 .devcontainer/devcontainer.json    # Dev Container config
 .gitignore                         # Keeps your projects local by default
 projects/
