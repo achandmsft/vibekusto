@@ -20,7 +20,21 @@ pip install azure-kusto-data azure-identity
 az login --scope "https://kusto.kusto.windows.net/.default"
 ```
 
-Open in VS Code → open Copilot Chat → select **vibekusto** from the agent dropdown (top of the chat panel) → ask your question.
+**VS Code:** Open in VS Code → open Copilot Chat → select **vibekusto** from the agent dropdown (top of the chat panel) → ask your question.
+
+**Copilot CLI:** Navigate to the repo in your terminal and use the agent directly from the command line:
+
+```bash
+# Interactive — select vibekusto from the agent list
+cd vibekusto
+copilot
+/agent    # pick vibekusto
+
+# One-shot — pass the agent and prompt directly
+copilot --agent=vibekusto -p "Show me storm damage by state from https://help.kusto.windows.net, database Samples"
+```
+
+The CLI reads the same `.github/agents/vibekusto.agent.md` and `.github/skills/` that VS Code uses — identical behavior, no config changes needed. Install with `npm install -g @github/copilot` (requires Node.js 22+).
 
 <details>
 <summary>Dev Container / Codespaces setup</summary>
@@ -176,29 +190,25 @@ git fetch upstream && git merge upstream/main
 |---|---|
 | 403 Forbidden | Wrong tenant: `az login --tenant <TENANT_ID> --scope "https://kusto.kusto.windows.net/.default"` |
 | ModuleNotFoundError | `pip install azure-kusto-data azure-identity` |
-| Agent not visible | Check `.github/agents/vibekusto.agent.md` exists, reload VS Code |
+| Agent not visible in VS Code | Check `.github/agents/vibekusto.agent.md` exists, reload VS Code |
+| Agent not visible in CLI | Run `copilot` from inside the repo directory, then `/agent` to list available agents |
 | Query timeout | Agent handles this automatically; try a smaller time range if it persists |
 
 ---
 
 <details>
-<summary>Why is vibekusto an agent and not a skill?</summary>
+<summary>Architecture: agent + skill split</summary>
 
-GitHub Copilot offers two extension points: **agents** (user-invoked, with their own identity and tools) and **skills** (reusable knowledge modules that agents can call). vibekusto is a single agent — not an agent wrapping a skill — and this is a deliberate choice.
+vibekusto uses a two-part architecture to balance context efficiency with comprehensive knowledge:
 
-| Factor | Agent + Skill (split) | Single Agent (current) |
-|---|---|---|
-| **Reusability** | The skill could be invoked by other agents | vibekusto's knowledge is highly specific (Kusto → HTML dashboards via Python) — no other agent would realistically invoke it |
-| **Context loading** | Skill instructions only load when matched by description heuristics | Agent instructions only load when the user selects vibekusto — same effect, no matching ambiguity |
-| **Coherence** | Orchestration and domain knowledge split across two files — easy to drift apart | Everything in one place — mode selection, workflow, heuristics, visual style, error recovery all reference each other |
-| **Mode selection** | The orchestrator would parse intent then delegate to the skill — adding a handoff seam | Mode selection flows directly into execution with no artificial boundary |
-| **Maintenance** | Two files to keep in sync | One file, one source of truth |
+| Component | File | Loaded | Purpose |
+|---|---|---|---|
+| **Agent** | `.github/agents/vibekusto.agent.md` | Every turn | Core workflow: mode selection, schema discovery, query execution, visualization rules, hypothesis investigation, error recovery, data security |
+| **Skill** | `.github/skills/vibekusto-heuristics/SKILL.md` | On-demand | Proven patterns: KQL authoring, dashboard rendering, pipeline architecture, analytical techniques, customer entity resolution |
 
-**When would a split make sense?**
-- If other agents needed Kusto → dashboard capabilities (e.g., a cost-optimization agent that also queries Kusto and renders HTML). The shared knowledge would become a genuine reusable skill.
-- If the agent definition grew past ~1,000 lines and started hitting context window limits. At ~550 lines today, it's well within bounds.
+The agent (~670 lines) loads on every turn and contains everything needed to understand the user's request and execute the workflow. The skill (~100 lines) loads automatically when the agent is actively writing KQL, generating HTML, or building data pipelines — but stays out of the way for simple follow-ups, saving ~4K tokens per turn.
 
-For now, vibekusto is a single-purpose agent with tightly coupled orchestration and domain knowledge. Splitting would add complexity without real reuse. The architecture can be revisited if shared Kusto querying capabilities are needed later.
+Both VS Code and Copilot CLI read these files from the same paths — no separate configuration needed.
 
 </details>
 
@@ -207,12 +217,14 @@ For now, vibekusto is a single-purpose agent with tightly coupled orchestration 
 ## Files
 
 ```
-.github/agents/vibekusto.agent.md    # Agent definition (the brain)
-.github/prompts/vibekusto.prompt.md  # Slash-command entry point
-.devcontainer/devcontainer.json    # Dev Container config
-.gitignore                         # Keeps your projects local by default
+.github/agents/vibekusto.agent.md         # Agent definition (the brain)
+.github/skills/vibekusto-heuristics/      # On-demand heuristics skill
+    SKILL.md                              # KQL, visualization, pipeline patterns
+.github/prompts/vibekusto.prompt.md       # Slash-command entry point
+.devcontainer/devcontainer.json           # Dev Container config
+.gitignore                                # Keeps your projects local by default
 projects/
-├── demo-visualize/                # Mode 1 demo (safe to delete)
-├── demo-explore/                  # Mode 2 demo (safe to delete)
-└── demo-investigate/              # Mode 3 demo (safe to delete)
+├── demo-visualize/                       # Mode 1 demo (safe to delete)
+├── demo-explore/                         # Mode 2 demo (safe to delete)
+└── demo-investigate/                     # Mode 3 demo (safe to delete)
 ```
