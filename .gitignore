@@ -25,6 +25,9 @@ __pycache__/
 .venv/
 venv/
 
+# Azure CLI state (credentials, sessions, telemetry)
+.azure/
+
 # OS
 .DS_Store
 Thumbs.db

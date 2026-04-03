@@ -120,17 +120,34 @@ Use a staged discovery pattern:
 // Stage 1: What databases exist?
 .show databases | project DatabaseName, PrettyName
 
-// Stage 2: What tables are in the target database?
+// Stage 2: What tables AND functions are available?
 .show tables | project TableName, Folder
+.show functions | project Name, Parameters, Body | take 50
 
 // Stage 3: What columns does the candidate table have?
 TableName | getschema | project ColumnName, ColumnType
 
 // Stage 4: Sample a few rows to understand the data shape
 TableName | take 5
+
+// Stage 5: Check data freshness — how recent is the data?
+TableName | summarize LatestRecord=max(TimeColumn), EarliestRecord=min(TimeColumn), TotalRows=count()
+
+// Stage 6: Check cardinalities of key columns
+TableName | summarize dcount(DimensionColumn, 2), dcount(MetricColumn, 2) | ...
 ```
 
 If a query fails because of a missing field or wrong table, return to schema discovery immediately. Do not guess column names a second time.
+
+**Prefer pre-cooked tables and functions.** Many enterprise databases have pre-aggregated tables (e.g., `DailyActiveUsers`, `MonthlyRevenue`) and Kusto functions that already compute what the user wants. Always check for these before writing complex aggregation logic from scratch. If you have a choice between a function and a cooked table, prefer the cooked table unless told otherwise. Users say "calculate" when they mean "get the number" — use the pre-computed source.
+
+**Inspect function implementations.** Before using a Kusto function, check its implementation with `.show function FunctionName` to understand what tables it reads, what date ranges it covers, and what columns it produces. This prevents subtle bugs from wrong assumptions about function behavior.
+
+**Data freshness matters.** Always check when the data was last ingested before drawing conclusions. Stale data (e.g., ingestion lag of 3-7 days) can cause misleading "drops" at the end of trend charts. Apply a lag window (e.g., `ago(6d)` as the end boundary) to avoid incomplete recent data.
+
+**Verify data exists before deep queries.** For unfamiliar clusters, run lightweight existence checks first — e.g., confirm an organization or entity has data in the table before running expensive aggregations. This prevents wasted query time on empty result sets.
+
+**Don't give up when data seems missing.** If a table doesn't have the right date range or columns, actively search for alternatives: use `.show tables` to find related tables, check for raw/source/archive tables that may have longer retention, examine function implementations with `.show function FunctionName` to find underlying tables, and check the date ranges of all candidate tables. Many databases hide rich data behind complex-type columns with names like `Properties`, `customDimensions`, `Measures`, or `JSON` — explore these with `parse_json()` and `| take 5`.
 
 ### 3. Generate the minimal execution artifact
 Create a small Python script using this skeleton:
@@ -177,7 +194,17 @@ Adapt this skeleton for each task. For cross-cluster joins, query each cluster s
 ### 4. Query safely and pragmatically
 When authoring KQL:
 - Add `set notruncation;` when large result sets are plausible.
-- Filter early — push WHERE clauses before joins and summarize.
+- Use `set query_results_cache_max_age = time(10m);` when re-running the same query during iterative development.
+- Filter early — push the most selective filters first, in this priority order:
+  1. Time filters and numeric/boolean filters (highest selectivity)
+  2. Fast string operators: `has`, `has_any`, `startswith` (term-index backed)
+  3. Slow string operators: `contains`, `matches regex` (full scan — use last)
+- Replace `contains` with `has` whenever the search term is a complete word/token. `has` uses the term index and is orders of magnitude faster. Only use `contains` for substring matches within tokens.
+- Consolidate `extend` + `summarize`: if an `extend` column is only used as a `summarize by` key or aggregation input, inline it directly into the `summarize` operator.
+- `project` or `project-away` unused columns early, especially before joins and heavy operators. For dynamic/JSON fields, extract only what is needed.
+- Use `dcount(column, 2)` (precision 2) for approximate distinct counts — it's significantly faster than exact counting and sufficient for dashboards.
+- Prefer `has_any(column, list)` over multiple `or` conditions for multi-value string matching.
+- Use date ranges with `>=` and `<` (half-open intervals): `Date >= startDate and Date < endDate`. This makes start-of-day parameters clean.
 - Summarize before wide joins when possible.
 - Use small probes first (`| take 5`, `| count`), then scale up.
 - Batch large key lists into groups of 2000-5000 for `in (...)` filters.
@@ -203,6 +230,12 @@ Real enterprise telemetry tables are enormous. Default to tight, conservative fi
 
 **Guiding principle:** It is always better to exclude noisy data and widen later than to drown in outliers. Make every filter configurable via environment variables with sensible defaults.
 
+**Significance thresholds (dual criteria):**
+When filtering for meaningful entities (services, templates, customers), apply both absolute AND relative thresholds. An entity should meet a minimum count (e.g., `MIN_ABS = 20 provisions`) AND a minimum share of the total (e.g., `MIN_PCT = 0.1%`). This eliminates meta-entities that touch everything at low levels while preserving genuinely active ones.
+
+**Deploy / activity capping:**
+When computing co-occurrence, affinity, or aggregate statistics, cap individual entity contributions (e.g., `DEPLOY_CAP = 20000`) so mega-entities don't distort statistical measures. A single high-volume template or customer shouldn't dominate every pair score.
+
 ### 5. Transform in Python when it reduces risk
 Use Python for:
 - Stitching data across clusters (query each, join dicts or DataFrames)
@@ -210,6 +243,10 @@ Use Python for:
 - Computing baselines, deltas, annualization, cohort logic, or pivots
 - Joining Kusto results with local CSVs, Excel files, or JSON
 - Exporting intermediate CSVs only if they help validate or debug
+- **Classification functions**: When raw data has many variants of the same concept (e.g., Azure resource providers, SDK user-agent strings), write a single `classify()` function that maps raw values → human-readable categories. Keep it in one place so it's easy to update.
+- **Retention and cohort analysis**: Use set intersection (`prev_week_subs & curr_week_subs`) for precise retention tracking. Classify churn destinations — distinguish "left platform entirely" from "migrated to different category." This reveals whether churn is product loss or category switching.
+- **Cross-source validation**: When possible, validate findings against multiple independent data sources (e.g., Kusto telemetry + CSV export + API metadata). If 2-3 sources agree, the finding is robust. Note the triangulation in the dashboard.
+- **Lift / affinity scoring**: For co-occurrence analysis (which services appear together, which features co-activate), use lift: `P(A∩B) / (P(A) * P(B))`. Lift > 1.0 means genuine affinity. Cap entity contributions to prevent mega-entities from distorting scores.
 
 ### 6. Mix in local data freely
 When the user wants to combine Kusto data with local files:
@@ -279,10 +316,49 @@ h1 {
 - **Verdict badges** for hypothesis dashboards: green `#66bb6a` (SUPPORTED), amber `#ffa726` (PARTIAL), red `#ff6b6b` (NOT SUPPORTED).
 - **Responsive**: `@media(max-width:980px)` collapse grid columns to 1.
 
+**Charting library choice:**
+- **Chart.js** (default): Include via CDN (`<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>`). Best for standard line, bar, doughnut, and radar charts. Use for most dashboards.
+- **Plotly.js** (for advanced visualizations): Include via CDN (`<script src="https://cdn.plot.ly/plotly-2.35.0.min.js"></script>`). Use when you need: sunburst hierarchies, treemaps, grouped bar comparisons, scatter matrices, or any chart type Chart.js doesn't support well. Configure Plotly for dark theme: `paper_bgcolor:'transparent', plot_bgcolor:'transparent', font:{color:'#ccc'}`.
+- Never mix both libraries in the same dashboard — pick one per HTML file.
+
+**Multi-dashboard navigation:**
+When a project produces multiple related dashboards, add a persistent top navigation bar so users can move between them without returning to the file browser:
+```python
+NAV_PAGES = [("overview.html", "Overview"), ("detail.html", "Detail"), ...]
+def nav_bar(active_page):
+    links = []
+    for href, label in NAV_PAGES:
+        style = ' style="color:#58a6ff;font-weight:700;border-bottom:2px solid #58a6ff"' if href == active_page else ""
+        links.append(f'<a href="{href}"{style}>{label}</a>')
+    return " &nbsp;|&nbsp; ".join(links)
+```
+Each dashboard passes its own filename as `active_page` to self-highlight. This creates a cohesive multi-page experience.
+
+**Scrollable tables:**
+For tables with more than 15 rows, wrap in a scrollable container: `<div style="max-height:480px; overflow-y:auto">`. This keeps dashboards scannable without infinite scrolling.
+
+**Label pills:**
+For categorical data in tables (GitHub labels, status tags, error codes), render as colored pills:
+```css
+.pill { display:inline-block; padding:2px 8px; border:1px solid #555; border-radius:12px; font-size:11px; margin:1px; }
+.pill.red { border-color:#ff6b6b; color:#ff6b6b; }
+.pill.green { border-color:#66bb6a; color:#66bb6a; }
+.pill.orange { border-color:#ffa726; color:#ffa726; }
+```
+
+**Teams / OneDrive / SharePoint compatibility:**
+Dashboards are frequently shared via Teams, OneDrive, or SharePoint. These platforms preview HTML but block JavaScript and have limited CSS support.
+- **Prefer static HTML** when the user will share via Teams. Avoid CDN `<script>` imports and Chart.js/Plotly when possible — use pure HTML/CSS bar charts, tables, and KPI cards instead.
+- **Add `<noscript>` fallback** when JavaScript is unavoidable. Explain that the file must be downloaded and opened in a browser.
+- **CSS Grid is NOT supported** in Teams/OneDrive HTML preview. `display:grid` and `grid-template-columns` render as if they don't exist — all grid children stack vertically or appear the same size. **Always use `display:flex`** with explicit `flex` sizing instead. This applies to proportion bars, KPI grids, and multi-column layouts.
+- **Flexbox proportion bars**: For showing category proportions (e.g., SDK mix per customer), use `display:flex` on a container with child `<div>` elements sized via `flex:N 0 0` where N is the percentage share. This renders correctly everywhere.
+- When in doubt, ask the user: "Will this be shared in Teams? I'll use static HTML for compatibility."
+
 **What NOT to do:**
 - No serif fonts, no paper/parchment backgrounds, no light themes.
 - No unlabeled axes or mystery charts.
 - No Chart.js tooltips without formatting — always provide `callbacks.label` with proper units.
+- No `display:grid` for any layout that needs to work in Teams preview.
 
 After generating the HTML, open it automatically so the user sees the result immediately.
 
@@ -461,6 +537,9 @@ For each sub-question, autonomously:
 - Include baselines and comparisons (e.g., "Floods cause $X per event vs. the average of $Y across all types").
 - Check for confounders — is the pattern real or an artifact of how the data is filtered?
 - If the data has a time dimension, check whether the pattern is stable, growing, or shrinking.
+- **Segment the analysis** — if the hypothesis could be an artifact of entity size (e.g., "only large customers show this"), test it across segments (small/medium/large). If the pattern holds across all segments, it's robust.
+- **Classify churn destinations** — when analyzing retention or adoption, distinguish between "left entirely" (platform loss) and "migrated to alternative" (category switching). These have very different implications.
+- **Cap outliers explicitly** — when a few mega-entities dominate the data, cap their contribution and note what was capped. Show results both with and without caps if the difference is significant.
 - Produce a standalone dashboard (one HTML file per sub-question) structured as an evidence brief:
   - **Question** at the top: the specific sub-question this dashboard answers.
   - **Verdict card**: "SUPPORTED", "PARTIALLY SUPPORTED", "NOT SUPPORTED", or "INCONCLUSIVE" — with a one-sentence answer.
@@ -510,11 +589,16 @@ If Azure auth fails or returns 403:
 - For 403 tenant mismatch: instruct the user: `az login --tenant <TENANT> --scope "https://kusto.kusto.windows.net/.default"`
 - Wait for user confirmation, then continue the run.
 
-### Transient network errors (SSL EOF, connection reset)
-- `SSLEOFError`, `ConnectionResetError`, and similar socket-level failures are transient.
-- The query-level retry loop handles these automatically — do not treat them as fatal.
-- If all retries fail, the pipeline-level retry in the orchestrator gets another shot.
-- Only escalate to the user if both retry levels are exhausted.
+### Network errors — classify and guide
+Provide actionable guidance based on the error type, not raw error messages:
+- **"failed to get cloud info" / ETIMEDOUT / ECONNREFUSED**: Network connectivity issue — check VPN, Wi-Fi, and that the cluster URL is correct.
+- **"timeout of Xms exceeded"**: Client-side timeout — increase `servertimeout` or optimize the query.
+- **"exceeded timeout" / "request timed out"**: Server-side timeout — prefix the query with `set servertimeout=10m;` or optimize.
+- **ENOTFOUND / EAI_AGAIN / getaddrinfo**: DNS resolution failure — verify the cluster URL, check DNS/network.
+- **AADSTS / unauthorized / authentication**: Auth failure — re-authenticate with `az login`.
+- **SSLEOFError / ConnectionResetError**: Transient — the query-level retry loop handles these automatically.
+
+Always present the classification and next steps first, then include technical details. Never surface raw error messages without context.
 
 ### Query limits
 If a query times out, exceeds memory, or hits row limits:
@@ -608,6 +692,61 @@ These patterns consistently work well:
 - **SSL EOF errors on Kusto are transient**: `SSLEOFError` / `ConnectionResetError` during long batch queries against corporate Kusto clusters resolve on retry. The fix is retry logic, not network debugging. These are especially common on `cogsvc.kusto.windows.net` during multi-hour runs.
 - **Overnight orchestrator pattern**: For multi-pipeline runs (e.g., SDK mix + retention), create a `run_overnight.py` orchestrator with pipeline-level retry, configurable widened parameters via environment variables (`LOOKBACK_DAYS`, `LOOKBACK_WEEKS`, `MAX_SUBS_PER_TPID`), and structured progress output. This lets the user kick off a comprehensive data refresh and walk away.
 - **Project data isolation**: Real analytics project folders containing live Kusto data must be fully gitignored (`projects/sdk-adoption/`). Only demo folders with synthetic data belong in the repo. Use belt-and-suspenders `.gitignore` rules: both `projects/**/*.html` (broad) and `projects/sdk-adoption/` (specific). Never mention "uncommitted changes" for files in a gitignored project — the user expects those to be local-only.
+- **Fully inline styles for injected components**: When generating HTML sections that get inserted into different dashboards (e.g., a shared customer view module), NEVER rely on CSS class names (`.bar-row`, `.bar-track`, `.section`). The host dashboard may not define those classes, causing invisible/broken rendering. Use fully inline `style="..."` on every element. This is the #1 cause of "the section renders but shows no bars/charts" bugs.
+- **Shared helper modules for cross-dashboard components**: When the same visual component (e.g., a customer ranking bar chart) needs to appear in multiple dashboards, extract it into a shared Python module that loads its own data cache and returns rendered HTML strings. Each dashboard renderer imports and calls it. This prevents copy-pasting large HTML generators and keeps them in sync.
+- **Include/exclude filter passthrough via closures**: When dashboards have variants (e.g., "including REST" vs "excluding REST"), any shared component must respect the same filter. Use a closure: `lambda label, lang, _incl=include_flag: classify(label, lang) if _incl or classify(label, lang) != "Excluded" else None`. Return `None` to skip rows in the shared module's aggregation loop.
+- **Verify CSS class availability before using in injected HTML**: Before using any CSS class in dynamically-injected HTML, check whether the host dashboard defines that class in its `<style>` block. If uncertain, use inline styles. A quick test: search the generated HTML for the class name — if it only appears in your injected section and never in a `<style>` or `class=` definition elsewhere, it won't render.
+
+### Customer / entity name resolution pattern
+- **Always resolve numeric IDs to names**: When dashboards show per-customer (TPID), per-subscription, or per-entity rows, resolve numeric IDs to human-readable names via dimension table lookups (e.g., `DimCustomer`, `DimSubscription`). Raw IDs are meaningless to stakeholders.
+- **Cache names separately**: Write the ID → name mapping to its own small JSON file (e.g., `_tpid_names.json`). This lets multiple renderers share the same mapping without re-querying. Only resolve the top N entities (50–100 by volume) to keep the lookup fast and the cache small.
+- **Include metadata alongside names**: When resolving customer IDs, also fetch segment, industry, and geography. Display these as sub-detail lines under the customer name — stakeholders immediately see "Is this a strategic account or a startup?" without leaving the dashboard.
+- **Separate extraction for per-entity data**: Per-entity queries (one row per TPID × dimension) return far more rows than aggregate queries. Create a dedicated extraction script that writes to its own cache. Renderers load both the main aggregate cache and the per-entity cache. This keeps the main extraction fast while entity data can be refreshed independently.
+- **Stacked proportion bars for customer views**: Show each customer as a horizontal bar sized by total calls, with colored segments showing the category/service breakdown. Use inline flexbox: a track `<div>` with `height:20px;background:#1a1a3e;border-radius:5px` containing inner `<div>`s with `flex:N 0 0;background:<color>`. Always include a value label and a sub-detail line with segment/industry.
+- **Entity classification must match host dashboard**: When classifying raw labels into categories for a customer bar chart, the classify function must match the host dashboard's category scheme exactly. Write bridge functions that map raw labels → the target dashboard's categories. A mismatch causes category names in the customer section that don't appear anywhere else in the dashboard.
+
+### KQL authoring heuristics
+- **Prefer pre-cooked tables over raw aggregation**: Enterprise Kusto databases frequently contain pre-aggregated tables and views. Always check `.show tables` and `.show functions` before writing complex `summarize` chains from scratch. Pre-cooked tables are faster, tested, and match the business definitions.
+- **Inspect function implementation before use**: Run `.show function FunctionName` to read the body of any Kusto function before calling it. This reveals what tables it reads, what date ranges it covers, what filters it applies, and what the output schema looks like. Never assume function behavior from the name alone.
+- **Verify date ranges before committing to a data source**: Always run `TableName | summarize min(DateColumn), max(DateColumn)` before using a table for analysis. If the table doesn't cover the user's requested date range, search for alternatives — don't apologize later.
+- **Explore dynamic/JSON columns**: Many enterprise tables hide rich data behind complex-type columns named `Properties`, `customDimensions`, `Measures`, `JSON`, or `Values`. Always `| take 5` and inspect these columns. Use `parse_json()`, `extract()`, or bracket notation (e.g., `customDimensions['key']`) to access nested values.
+- **`has` > `contains` for word matching**: `has` uses the term index (O(1) lookup) while `contains` does a full substring scan. Use `has` whenever the search value is a complete token/word. Reserve `contains` only for true substring matches within words.
+- **`has_any()` for multi-value filters**: Instead of chaining `or` conditions, use `has_any(column, 'val1', 'val2', 'val3')` for term-index-backed multi-value matching.
+- **`dcount(column, 2)` for approximate distinct counts**: Precision 2 is fast and sufficient for dashboard-quality numbers. Only use exact `dcount` when precise counts are critical.
+- **Half-open date intervals**: Use `Date >= startDate and Date < endDate` so both parameters can be start-of-day values. This eliminates off-by-one errors and works cleanly with `startofday()`, `startofweek()`, etc.
+- **`set query_results_cache_max_age`**: For iterative development where the same query runs repeatedly, prefix with `set query_results_cache_max_age = time(10m);` to use server-side result caching. Remove this for final production runs.
+- **Inline `extend` into `summarize`**: If an `extend` column is only consumed by a `summarize by` clause or aggregation, move the expression directly into `summarize` to avoid carrying extra columns through the pipeline.
+- **`project-away` before joins**: Remove columns not needed for the join or downstream logic before `join` or `lookup` operators. This reduces memory pressure and speeds up execution.
+
+### Visualization heuristics
+- **Plotly.js for hierarchical data**: Use Plotly sunburst charts for two-level hierarchies (e.g., org → referrer, category → sub-item) and treemaps for proportional area displays. Chart.js lacks native hierarchy support. Include Plotly via CDN and set `paper_bgcolor:'transparent', plot_bgcolor:'transparent', font:{color:'#ccc'}` for dark theme.
+- **Grouped bar for A/B comparisons**: When comparing two or more metrics across the same categories (e.g., success/failure/cancelled per repo), use Plotly's `barmode:'group'` rather than stacked bars. This avoids segment-size illusions and makes absolute comparisons trivial.
+- **Multi-dashboard nav bar**: For projects producing 3+ dashboards, always add a persistent top nav bar linking all pages. Each page highlights its own link with `color:#58a6ff; border-bottom:2px solid #58a6ff`. This transforms a loose collection of files into a cohesive analytics app.
+- **Scrollable table containers**: Wrap tables with >15 rows in `max-height:480px; overflow-y:auto`. This keeps dashboards scannable. Add sticky `<thead>` with `position:sticky; top:0; background:#1a1a2e` for context while scrolling.
+- **Label pills for categorical tags**: Render tags/labels as small colored pills (`border-radius:12px; font-size:11px`) with semantic coloring — red for bugs/errors, green for resolved, orange for warnings. Max 5 pills per cell to avoid overflow.
+- **Dynamic chart IDs via hash**: Generate unique chart container IDs with `hashlib.md5(os.urandom(8)).hexdigest()[:10]` to prevent ID collisions when rendering multiple charts in the same page dynamically.
+- **KPI color classes**: Support colored KPI values with CSS classes (`.val.red`, `.val.orange`, `.val.green`) so each KPI card can signal status at a glance (e.g., churn rate in red, retention in green).
+- **Inline styles for portability**: When generating reusable HTML components (bar charts, customer tables) that may be injected into multiple dashboards with different stylesheets, use fully inline `style=` attributes. Define style constants at the top of the generator function for readability: `S_ROW = 'display:flex;align-items:center;margin-bottom:5px'` then reference as `f'<div style="{S_ROW}">'`. This avoids the invisible-component bug caused by missing CSS class definitions.
+- **Static HTML bar charts**: When Chart.js/Plotly aren't available (static HTML for Teams), render bar charts as pure HTML/CSS: a flex container per row with a label `<div>` (fixed width), a track `<div>` (flex:1, dark background, border-radius), inner fill `<div>`s (colored, flex-sized), and a value `<div>` (fixed width). Hover `title=` attributes provide tooltip-like detail. This renders identically in any browser and any HTML preview.
+
+### Schema discovery and data pipeline heuristics
+- **Data freshness check before analysis**: Always run `TableName | summarize max(TimeColumn)` before any trend analysis. Stale data causes misleading "drops" at the end of charts. Apply a lag window (`ago(6d)`) to exclude incomplete recent data.
+- **Existence probing before deep queries**: For unfamiliar clusters, verify data exists with lightweight counts (`TableName | where Filter | count`) before running expensive aggregations. Probe progressively: org exists → table has data → freshness is recent → then query deeply.
+- **Multi-stage independent queries**: For complex analyses, split into 4-5 independent query stages (e.g., popularity, service profile, AI detail, global aggregates). Each stage can be cached, retried, and parallelized independently. This is far more resilient than one mega-query.
+- **Employee / internal filtering via join table**: When analyzing external user behavior, join against an employee lookup table to exclude internal activity. Pattern: `let employees = EmployeeTable | project UserName; MainTable | where User !in (employees) and User !endswith '[bot]'`.
+- **Service-specific column abstraction**: Enterprise Kusto tables often have different column names for the same semantic (e.g., `Calls` vs `calls`, `ResponseCode` vs `resultCode`). Abstract this into a service definition dict: `{"AOAI": {"table": "...", "calls_col": "Calls", "code_col": "ResponseCode"}}`. Query builders read from the dict.
+- **Datetime ISO serialization guard**: Kusto returns datetime objects. Always handle them in JSON export: `json.dump(data, f, default=str)`. When reading cached data back, parse ISO strings if needed.
+
+### Analytical heuristics
+- **Lift-based co-occurrence scoring**: For finding genuine affinities between entities (services that co-deploy, features that co-activate), compute lift: `P(A∩B) / (P(A) * P(B))`. Lift > 1.2 = genuine affinity. Cap entity contributions (`DEPLOY_CAP = 20000`) so mega-entities don't distort every pair. Keep the visualization sparse (top 15 edges max).
+- **Dual-threshold significance filtering**: When determining if an entity is "significant," apply both a minimum absolute count AND a minimum percentage of total. This eliminates meta-entities (scaffolding tools, test subscriptions) that touch everything at low volume.
+- **Architecture fingerprinting**: When analyzing multi-service deployments, generate human-readable pattern strings (e.g., `"OpenAI SDK + Container Apps | Cosmos DB | APIM"`). These fingerprints enable clustering, comparison, and clear communication of architecture patterns.
+- **Churn destination classification**: Distinguish full churn (left the platform) from migration (switched to a different SDK/service). Pattern: check if the churned entity appears in ANY category next period (migrated) or disappears entirely (full churn). These have profoundly different product implications.
+- **Customer segmentation to disprove size artifacts**: When a hypothesis could be explained by "it's just large customers," test across subscription-cap brackets (1, 3, 5, all subscriptions per entity). If the pattern holds across all brackets, it's not a size artifact.
+- **Cross-source validation**: When the same question can be answered from 2-3 independent data sources (Kusto telemetry, CSV exports, API metadata), query all of them and check agreement. Note the triangulation in the dashboard — it dramatically increases confidence.
+- **Retention via set intersection**: For week-over-week retention, track the set of active entities per period. Retention = `len(week_N_set & week_N+1_set) / len(week_N_set)`. This is exact, not approximate. Also track "same-cohort retention" (stayed in same category) vs. "any retention" (stayed on platform in any category).
+- **Language-specific classification rules**: When classifying SDK user-agents or framework identifiers, use per-language regex rule sets with priority ordering (most specific pattern first). Languages have different ecosystems — Java has Spring AI and LangChain4j; Python has LangChain and AutoGen; .NET has Semantic Kernel. One-size-fits-all rules produce misclassifications.
+- **Authoritative metadata overrides**: When heuristic classification (e.g., from template names) conflicts with an authoritative source (e.g., GitHub repo metadata), use the authoritative source. Store overrides in a small JSON file that can be maintained independently.
 
 ## Capabilities
 The agent handles the full spectrum of Kusto analytics workflows:
