@@ -302,11 +302,18 @@ h1 {
   font-size: 11px;
 }
 .kpi .value { font-size: 30px; margin-top: 6px; font-weight: 700; }
+.kpi-grid { display: flex; flex-wrap: wrap; gap: 14px; margin: 18px 0; }
+.kpi-grid > .kpi { flex: 1 1 200px; min-width: 200px; }
+.grid-2 { display: flex; flex-wrap: wrap; gap: 18px; }
+.grid-2 > * { flex: 1 1 45%; min-width: 300px; }
+@media(max-width:980px) { .grid-2 { flex-direction: column; } }
 ```
+
+**CRITICAL — never use CSS Grid (`display:grid`, `grid-template-columns`).** Teams/OneDrive/SharePoint HTML preview does not support CSS Grid. All grid children render as if `display:block` — KPI cards stack vertically, multi-column layouts collapse, and proportion bars break. **Always use `display:flex` with `flex-wrap:wrap` instead.** This is the #1 cause of dashboards looking broken when shared via Teams.
 
 **Key visual rules:**
 - **Charts on top.** The most important visual evidence goes above the fold. Tables and details go below.
-- **KPI cards** for headline numbers — 3–5 cards in a responsive grid, directly under the hero.
+- **KPI cards** for headline numbers — 3–5 cards in a responsive flexbox row (`display:flex; flex-wrap:wrap`), directly under the hero. Never use `display:grid` for KPI layouts.
 - **Units note** on every chart: a small blue `<div class="units-note">` line that says what the axis measures (e.g., "Unit: API calls per day, by SDK family"). Never leave a chart without unit context.
 - **Glass-morphism panels** with subtle semi-transparent backgrounds and `#2a2a4e` borders.
 - **Gradient headings** using `linear-gradient(135deg, #ffa726, #42a5f5)` with `-webkit-background-clip: text`.
@@ -314,7 +321,20 @@ h1 {
 - **Color palette**: Use warm-to-cool progressions. Core palette: `#c65d46` (red-orange), `#e88a6e` (salmon), `#42a5f5` (blue), `#7d61a8` (purple), `#ffa726` (amber), `#66bb6a` (green), `#78909c` (slate).
 - **Negative values** in `#ff6b6b`.
 - **Verdict badges** for hypothesis dashboards: green `#66bb6a` (SUPPORTED), amber `#ffa726` (PARTIAL), red `#ff6b6b` (NOT SUPPORTED).
-- **Responsive**: `@media(max-width:980px)` collapse grid columns to 1.
+- **Responsive**: `@media(max-width:980px)` use `flex-direction:column` to stack columns.
+
+**`<noscript>` fallback for Chart.js dashboards:**
+When a dashboard uses Chart.js or Plotly (requires JavaScript), always add a `<noscript>` block immediately after the hero section:
+```html
+<noscript>
+<div style="background:linear-gradient(135deg,rgba(30,30,55,.9),rgba(20,20,40,.9));border:2px solid #ffa726;border-radius:14px;padding:20px 24px;margin:18px 0;max-width:700px">
+<p style="color:#ffa726;font-weight:700;font-size:15px;margin-bottom:8px">⚠️ This dashboard requires JavaScript</p>
+<p style="color:#d0d0e0;font-size:13px;line-height:1.6">Teams, OneDrive, and SharePoint preview block JavaScript. To view this interactive dashboard:<br>
+<strong style="color:#42a5f5">1.</strong> Download the HTML file &nbsp;→&nbsp; <strong style="color:#42a5f5">2.</strong> Open it in Edge or Chrome</p>
+</div>
+</noscript>
+```
+This ensures Teams users see an actionable message instead of a blank page.
 
 **Charting library choice:**
 - **Chart.js** (default): Include via CDN (`<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>`). Best for standard line, bar, doughnut, and radar charts. Use for most dashboards.
